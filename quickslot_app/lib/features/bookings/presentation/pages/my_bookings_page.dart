@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quickslot_app/core/di/app_dependencies.dart';
+import 'package:quickslot_app/core/utils/responsive_utils.dart';
+import 'package:quickslot_app/core/widgets/app_empty_view.dart';
+import 'package:quickslot_app/core/widgets/app_error_view.dart';
+import 'package:quickslot_app/core/widgets/app_loading_view.dart';
 import 'package:quickslot_app/core/widgets/app_scaffold.dart';
 import 'package:quickslot_app/features/bookings/domain/entities/user_booking.dart';
 import 'package:quickslot_app/features/bookings/presentation/cubit/cancel_booking_cubit.dart';
@@ -49,15 +53,18 @@ class MyBookingsPage extends StatelessWidget {
           builder: (context, state) {
             return switch (state.status) {
               MyBookingsStatus.initial || MyBookingsStatus.loading =>
-                const Center(
-                  child: CircularProgressIndicator(),
-                ),
-              MyBookingsStatus.error => _MyBookingsErrorView(
+                const AppLoadingView(),
+              MyBookingsStatus.error => AppErrorView(
+                  title: 'Could not load bookings',
                   message: state.errorMessage ?? 'Failed to load bookings',
                   onRetry: () =>
                       context.read<MyBookingsCubit>().loadBookings(),
                 ),
-              MyBookingsStatus.empty => const _MyBookingsEmptyView(),
+              MyBookingsStatus.empty => const AppEmptyView(
+                  icon: Icons.event_busy_outlined,
+                  title: 'No bookings yet',
+                  subtitle: 'Book a slot from a venue to see it here.',
+                ),
               MyBookingsStatus.loaded => _MyBookingsListView(
                   bookings: state.bookings,
                 ),
@@ -92,13 +99,17 @@ class _MyBookingsListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final padding = ResponsiveUtils.horizontalPadding(
+      MediaQuery.sizeOf(context).width,
+    );
+
     return BlocBuilder<CancelBookingCubit, CancelBookingState>(
       builder: (context, cancelState) {
         return RefreshIndicator(
           onRefresh: () => context.read<MyBookingsCubit>().loadBookings(),
           child: ListView.separated(
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(padding),
             itemCount: bookings.length,
             separatorBuilder: (_, __) => const SizedBox(height: 12),
             itemBuilder: (context, index) {
@@ -115,99 +126,6 @@ class _MyBookingsListView extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-}
-
-class _MyBookingsEmptyView extends StatelessWidget {
-  const _MyBookingsEmptyView();
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.event_busy_outlined,
-              size: 64,
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'No bookings yet',
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Book a slot from a venue to see it here.',
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _MyBookingsErrorView extends StatelessWidget {
-  const _MyBookingsErrorView({
-    required this.message,
-    required this.onRetry,
-  });
-
-  final String message;
-  final VoidCallback onRetry;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.error_outline,
-              size: 64,
-              color: theme.colorScheme.error,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Could not load bookings',
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              message,
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: onRetry,
-              child: const Text('Retry'),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

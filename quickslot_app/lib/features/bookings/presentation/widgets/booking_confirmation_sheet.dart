@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:quickslot_app/core/widgets/app_loading_indicator.dart';
 import 'package:quickslot_app/features/bookings/presentation/cubit/booking_cubit.dart';
 import 'package:quickslot_app/features/bookings/presentation/cubit/booking_state.dart';
 import 'package:quickslot_app/features/venues/domain/entities/slot.dart';
@@ -105,13 +106,7 @@ class BookingConfirmationSheet extends StatelessWidget {
                                 context.read<BookingCubit>().bookSlot(slot.id);
                               },
                         child: isBooking
-                            ? const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              )
+                            ? const AppLoadingIndicator()
                             : const Text('Confirm'),
                       ),
                     ),

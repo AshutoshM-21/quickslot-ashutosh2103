@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quickslot_app/core/widgets/responsive_content.dart';
 
 class AppScaffold extends StatelessWidget {
   const AppScaffold({
@@ -31,7 +32,9 @@ class AppScaffold extends StatelessWidget {
               automaticallyImplyLeading: showBackButton,
               actions: actions,
             ),
-      body: SafeArea(child: body),
+      body: SafeArea(
+        child: ResponsiveContent(child: body),
+      ),
       floatingActionButton: floatingActionButton,
       bottomNavigationBar: bottomNavigationBar,
     );

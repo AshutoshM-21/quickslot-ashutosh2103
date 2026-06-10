@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quickslot_app/core/widgets/app_loading_indicator.dart';
 import 'package:quickslot_app/features/bookings/domain/entities/user_booking.dart';
 
 class UserBookingCard extends StatelessWidget {
@@ -89,13 +90,9 @@ class UserBookingCard extends StatelessWidget {
                       child: TextButton.icon(
                         onPressed: isCancelling ? null : onCancel,
                         icon: isCancelling
-                            ? SizedBox(
-                                width: 16,
-                                height: 16,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: theme.colorScheme.error,
-                                ),
+                            ? AppLoadingIndicator(
+                                size: 16,
+                                color: theme.colorScheme.error,
                               )
                             : Icon(
                                 Icons.cancel_outlined,

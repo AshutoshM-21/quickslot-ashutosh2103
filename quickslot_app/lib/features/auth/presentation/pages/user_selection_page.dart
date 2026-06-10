@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:quickslot_app/core/router/app_routes.dart';
 import 'package:quickslot_app/core/widgets/app_scaffold.dart';
+import 'package:quickslot_app/core/widgets/responsive_padding.dart';
 import 'package:quickslot_app/features/auth/presentation/cubit/user_selection_cubit.dart';
 import 'package:quickslot_app/features/auth/presentation/cubit/user_selection_state.dart';
 import 'package:quickslot_app/features/auth/presentation/widgets/user_option_tile.dart';
@@ -22,8 +23,7 @@ class UserSelectionPage extends StatelessWidget {
         title: 'Select User',
         body: BlocBuilder<UserSelectionCubit, UserSelectionState>(
           builder: (context, state) {
-            return Padding(
-              padding: const EdgeInsets.all(24),
+            return ResponsivePadding(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
