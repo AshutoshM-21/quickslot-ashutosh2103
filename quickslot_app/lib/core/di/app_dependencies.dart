@@ -2,6 +2,7 @@ import 'package:quickslot_app/core/network/api_client.dart';
 import 'package:quickslot_app/features/auth/data/repositories/user_repository.dart';
 import 'package:quickslot_app/features/auth/data/repositories/user_session.dart';
 import 'package:quickslot_app/features/bookings/data/repositories/booking_repository.dart';
+import 'package:quickslot_app/features/bookings/data/repositories/my_bookings_repository.dart';
 import 'package:quickslot_app/features/venues/data/repositories/slot_repository.dart';
 import 'package:quickslot_app/features/venues/data/repositories/venue_repository.dart';
 
@@ -17,4 +18,6 @@ class AppDependencies {
       SlotRepository(apiClient: apiClient);
   static final BookingRepository bookingRepository =
       BookingRepository(apiClient: apiClient);
+  static final MyBookingsRepository myBookingsRepository =
+      MyBookingsRepository(apiClient: apiClient);
 }

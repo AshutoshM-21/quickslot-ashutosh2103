@@ -28,7 +28,7 @@ class BookingCubit extends Cubit<BookingState> {
     }
 
     emit(
-      BookingState(
+      state.copyWith(
         status: BookingStatus.booking,
         slotId: slotId,
         clearError: true,
@@ -42,7 +42,7 @@ class BookingCubit extends Cubit<BookingState> {
       );
 
       emit(
-        BookingState(
+        state.copyWith(
           status: BookingStatus.success,
           slotId: slotId,
           clearError: true,
@@ -50,7 +50,7 @@ class BookingCubit extends Cubit<BookingState> {
       );
     } catch (error) {
       emit(
-        BookingState(
+        state.copyWith(
           status: BookingStatus.failure,
           slotId: slotId,
           errorMessage: error.toString().replaceFirst('Exception: ', ''),

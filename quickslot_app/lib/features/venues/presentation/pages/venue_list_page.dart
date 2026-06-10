@@ -19,6 +19,13 @@ class VenueListPage extends StatelessWidget {
 
     return AppScaffold(
       title: AppConstants.appName,
+      actions: [
+        IconButton(
+          onPressed: () => context.push(AppRoutes.myBookings),
+          icon: const Icon(Icons.event_note_outlined),
+          tooltip: 'My bookings',
+        ),
+      ],
       body: BlocBuilder<VenuesCubit, VenuesState>(
         builder: (context, state) {
           return switch (state.status) {

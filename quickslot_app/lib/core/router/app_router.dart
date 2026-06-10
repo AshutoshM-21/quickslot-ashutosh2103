@@ -6,6 +6,8 @@ import 'package:quickslot_app/core/router/app_routes.dart';
 import 'package:quickslot_app/features/auth/presentation/cubit/user_selection_cubit.dart';
 import 'package:quickslot_app/features/auth/presentation/pages/user_selection_page.dart';
 import 'package:quickslot_app/features/bookings/presentation/cubit/booking_cubit.dart';
+import 'package:quickslot_app/features/bookings/presentation/cubit/my_bookings_cubit.dart';
+import 'package:quickslot_app/features/bookings/presentation/pages/my_bookings_page.dart';
 import 'package:quickslot_app/features/venues/domain/entities/venue.dart';
 import 'package:quickslot_app/features/venues/presentation/cubit/slots_cubit.dart';
 import 'package:quickslot_app/features/venues/presentation/cubit/venues_cubit.dart';
@@ -44,6 +46,19 @@ class AppRouter {
                 VenuesCubit(venueRepository: AppDependencies.venueRepository)
                   ..loadVenues(),
             child: const VenueListPage(),
+          );
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.myBookings,
+        name: AppRoutes.myBookings,
+        builder: (context, state) {
+          return BlocProvider(
+            create: (_) => MyBookingsCubit(
+              myBookingsRepository: AppDependencies.myBookingsRepository,
+              userSession: AppDependencies.userSession,
+            )..loadBookings(),
+            child: const MyBookingsPage(),
           );
         },
       ),
