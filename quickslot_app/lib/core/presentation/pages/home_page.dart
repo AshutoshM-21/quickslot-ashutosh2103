@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quickslot_app/core/constants/app_constants.dart';
+import 'package:quickslot_app/core/di/app_dependencies.dart';
 import 'package:quickslot_app/core/widgets/app_scaffold.dart';
 
 class HomePage extends StatelessWidget {
@@ -8,6 +9,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final selectedUser = AppDependencies.userSession.selectedUser;
 
     return AppScaffold(
       title: AppConstants.appName,
@@ -24,7 +26,7 @@ class HomePage extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               Text(
-                'Welcome to ${AppConstants.appName}',
+                'Welcome, ${selectedUser?.name ?? 'Guest'}',
                 style: theme.textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
@@ -32,7 +34,7 @@ class HomePage extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                'Project foundation is ready.',
+                'Signed in as user ID ${selectedUser?.id ?? '-'}',
                 style: theme.textTheme.bodyLarge?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
