@@ -23,4 +23,15 @@ class UserBookingModel extends UserBooking {
       createdAt: DateTime.parse(json['created_at'].toString()),
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'venue_name': venueName,
+      'slot_date': DateUtils.formatForApi(slotDate),
+      'start_time': startTime,
+      'end_time': endTime,
+      'created_at': createdAt.toIso8601String(),
+    };
+  }
 }

@@ -17,6 +17,7 @@ import 'package:quickslot_app/features/venues/presentation/cubit/slots_state.dar
 import 'package:quickslot_app/features/venues/presentation/widgets/slot_date_picker.dart';
 import 'package:quickslot_app/core/widgets/app_status_chip.dart';
 import 'package:quickslot_app/features/venues/presentation/widgets/slot_grid_tile.dart';
+import 'package:quickslot_app/features/venues/presentation/widgets/slot_time_filter_bar.dart';
 
 class VenueDetailPage extends StatelessWidget {
   const VenueDetailPage({
@@ -73,7 +74,16 @@ class VenueDetailPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     const _SlotLegend(),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
+                    SlotTimeFilterBar(
+                      selectedFilter: state.timeFilter,
+                      onFilterSelected: (filter) {
+                        context.read<SlotsCubit>().setTimeFilter(filter);
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    if (!state.isRealtimeConnected)
+                      const _RealtimeStatusBanner(),
                     Expanded(
                       child: switch (state.status) {
                         SlotsStatus.initial || SlotsStatus.loading =>
@@ -90,15 +100,23 @@ class VenueDetailPage extends StatelessWidget {
                             title: 'No slots for this date',
                             subtitle: 'Try selecting a different date.',
                           ),
-                        SlotsStatus.loaded => _SlotsGridView(
-                            slots: state.slots,
-                            onSlotTap: (slot) {
-                              showBookingConfirmationSheet(
-                                context: context,
-                                slot: slot,
-                              );
-                            },
-                          ),
+                        SlotsStatus.loaded =>
+                          state.filteredSlots.isEmpty
+                              ? const AppEmptyView(
+                                  icon: Icons.filter_alt_outlined,
+                                  title: 'No slots in this time range',
+                                  subtitle:
+                                      'Try another filter or select a different date.',
+                                )
+                              : _SlotsGridView(
+                                  slots: state.filteredSlots,
+                                  onSlotTap: (slot) {
+                                    showBookingConfirmationSheet(
+                                      context: context,
+                                      slot: slot,
+                                    );
+                                  },
+                                ),
                       },
                     ),
                   ],
@@ -143,6 +161,23 @@ class _SlotsRefreshListenerState extends State<_SlotsRefreshListener> {
 
   @override
   Widget build(BuildContext context) => widget.child;
+}
+
+class _RealtimeStatusBanner extends StatelessWidget {
+  const _RealtimeStatusBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Text(
+        'Live updates unavailable. Pull to refresh slots manually.',
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.error,
+            ),
+      ),
+    );
+  }
 }
 
 class _SlotLegend extends StatelessWidget {

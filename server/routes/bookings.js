@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const pool = require("../db/pool");
+const { emitSlotUpdate } = require("../realtime");
 
 router.post("/", async (req, res) => {
   const client = await pool.connect();
@@ -68,6 +69,13 @@ router.post("/", async (req, res) => {
 
     await client.query("COMMIT");
 
+    emitSlotUpdate({
+      venueId: slot.venue_id,
+      slotId: slot.id,
+      date: slot.slot_date,
+      status: "BOOKED",
+    });
+
     return res.status(201).json({
       success: true,
       data: bookingResult.rows[0],
@@ -132,10 +140,11 @@ router.delete("/:bookingId", async (req, res) => {
 
     const bookingResult = await client.query(
       `
-      SELECT *
-      FROM bookings
-      WHERE id = $1
-      FOR UPDATE
+      SELECT b.*, s.venue_id, s.slot_date
+      FROM bookings b
+      JOIN slots s ON b.slot_id = s.id
+      WHERE b.id = $1
+      FOR UPDATE OF b
       `,
       [bookingId]
     );
@@ -169,6 +178,13 @@ router.delete("/:bookingId", async (req, res) => {
     );
 
     await client.query("COMMIT");
+
+    emitSlotUpdate({
+      venueId: booking.venue_id,
+      slotId: booking.slot_id,
+      date: booking.slot_date,
+      status: "AVAILABLE",
+    });
 
     res.json({
       success: true,

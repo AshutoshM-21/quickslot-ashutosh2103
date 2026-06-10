@@ -2,8 +2,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:quickslot_app/app.dart';
 import 'package:quickslot_app/core/constants/app_constants.dart';
 import 'package:quickslot_app/core/di/app_dependencies.dart';
-
 void main() {
+  setUpAll(() async {
+    TestWidgetsFlutterBinding.ensureInitialized();
+    await AppDependencies.init();
+  });
+
   setUp(() {
     AppDependencies.userSession.clear();
   });

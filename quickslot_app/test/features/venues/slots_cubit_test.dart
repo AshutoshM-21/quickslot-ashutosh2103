@@ -3,6 +3,7 @@ import 'package:quickslot_app/core/network/api_client.dart';
 import 'package:quickslot_app/core/utils/date_utils.dart';
 import 'package:quickslot_app/features/venues/data/repositories/slot_repository.dart';
 import 'package:quickslot_app/features/venues/domain/entities/slot.dart';
+import 'package:quickslot_app/features/venues/domain/entities/slot_time_filter.dart';
 import 'package:quickslot_app/features/venues/presentation/cubit/slots_cubit.dart';
 import 'package:quickslot_app/features/venues/presentation/cubit/slots_state.dart';
 
@@ -106,6 +107,31 @@ void main() {
         cubit.state.selectedDate,
         testDate.add(const Duration(days: 1)),
       );
+      await cubit.close();
+    });
+
+    test('preserves time filter after reload', () async {
+      final cubit = SlotsCubit(
+        slotRepository: _FakeSlotRepository(
+          (_, __) async => const [
+            Slot(
+              id: 1,
+              startTime: '10:00:00',
+              endTime: '11:00:00',
+              status: SlotStatus.available,
+            ),
+          ],
+        ),
+        venueId: 1,
+        initialDate: testDate,
+      );
+
+      await cubit.loadSlots();
+      cubit.setTimeFilter(SlotTimeFilter.morning);
+      await cubit.loadSlots();
+
+      expect(cubit.state.timeFilter, SlotTimeFilter.morning);
+      expect(cubit.state.filteredSlots.length, 1);
       await cubit.close();
     });
   });

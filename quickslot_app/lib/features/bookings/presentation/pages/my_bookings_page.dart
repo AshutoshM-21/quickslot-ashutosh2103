@@ -11,6 +11,7 @@ import 'package:quickslot_app/features/bookings/presentation/cubit/cancel_bookin
 import 'package:quickslot_app/features/bookings/presentation/cubit/cancel_booking_state.dart';
 import 'package:quickslot_app/features/bookings/presentation/cubit/my_bookings_cubit.dart';
 import 'package:quickslot_app/features/bookings/presentation/cubit/my_bookings_state.dart';
+import 'package:quickslot_app/features/bookings/presentation/widgets/cached_data_banner.dart';
 import 'package:quickslot_app/features/bookings/presentation/widgets/cancel_booking_dialog.dart';
 import 'package:quickslot_app/features/bookings/presentation/widgets/user_booking_card.dart';
 
@@ -67,6 +68,7 @@ class MyBookingsPage extends StatelessWidget {
                 ),
               MyBookingsStatus.loaded => _MyBookingsListView(
                   bookings: state.bookings,
+                  showCachedBanner: state.isShowingCachedData,
                 ),
             };
           },
@@ -77,9 +79,13 @@ class MyBookingsPage extends StatelessWidget {
 }
 
 class _MyBookingsListView extends StatelessWidget {
-  const _MyBookingsListView({required this.bookings});
+  const _MyBookingsListView({
+    required this.bookings,
+    this.showCachedBanner = false,
+  });
 
   final List<UserBooking> bookings;
+  final bool showCachedBanner;
 
   Future<void> _handleCancel(
     BuildContext context,
@@ -110,10 +116,15 @@ class _MyBookingsListView extends StatelessWidget {
           child: ListView.separated(
             physics: const AlwaysScrollableScrollPhysics(),
             padding: EdgeInsets.all(padding),
-            itemCount: bookings.length,
+            itemCount: bookings.length + (showCachedBanner ? 1 : 0),
             separatorBuilder: (_, __) => const SizedBox(height: 12),
             itemBuilder: (context, index) {
-              final booking = bookings[index];
+              if (showCachedBanner && index == 0) {
+                return const CachedDataBanner();
+              }
+
+              final bookingIndex = showCachedBanner ? index - 1 : index;
+              final booking = bookings[bookingIndex];
               final isCancelling = cancelState.isCancelling &&
                   cancelState.bookingId == booking.id;
 

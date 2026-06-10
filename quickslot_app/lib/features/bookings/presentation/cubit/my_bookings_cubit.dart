@@ -21,6 +21,7 @@ class MyBookingsCubit extends Cubit<MyBookingsState> {
         state.copyWith(
           status: MyBookingsStatus.error,
           errorMessage: 'No user selected',
+          clearCachedFlag: true,
         ),
       );
       return;
@@ -30,19 +31,21 @@ class MyBookingsCubit extends Cubit<MyBookingsState> {
       state.copyWith(
         status: MyBookingsStatus.loading,
         clearError: true,
+        clearCachedFlag: true,
       ),
     );
 
     try {
-      final bookings = await _myBookingsRepository.getUserBookings(
+      final result = await _myBookingsRepository.getUserBookings(
         userId: user.id,
       );
 
-      if (bookings.isEmpty) {
+      if (result.bookings.isEmpty) {
         emit(
           state.copyWith(
             status: MyBookingsStatus.empty,
-            bookings: bookings,
+            bookings: result.bookings,
+            isShowingCachedData: result.isFromCache,
             clearError: true,
           ),
         );
@@ -52,7 +55,8 @@ class MyBookingsCubit extends Cubit<MyBookingsState> {
       emit(
         state.copyWith(
           status: MyBookingsStatus.loaded,
-          bookings: bookings,
+          bookings: result.bookings,
+          isShowingCachedData: result.isFromCache,
           clearError: true,
         ),
       );
@@ -61,6 +65,7 @@ class MyBookingsCubit extends Cubit<MyBookingsState> {
         state.copyWith(
           status: MyBookingsStatus.error,
           errorMessage: error.toString().replaceFirst('Exception: ', ''),
+          clearCachedFlag: true,
         ),
       );
     }

@@ -2,13 +2,20 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:quickslot_app/core/network/api_client.dart';
 import 'package:quickslot_app/features/auth/data/repositories/user_session.dart';
 import 'package:quickslot_app/features/auth/domain/entities/user.dart';
+import 'package:quickslot_app/features/bookings/data/local/my_bookings_local_data_source.dart';
+import 'package:quickslot_app/features/bookings/data/remote/booking_remote_data_source.dart';
 import 'package:quickslot_app/features/bookings/data/repositories/booking_repository.dart';
 import 'package:quickslot_app/features/bookings/domain/entities/booking.dart';
 import 'package:quickslot_app/features/bookings/presentation/cubit/booking_cubit.dart';
 import 'package:quickslot_app/features/bookings/presentation/cubit/booking_state.dart';
+import '../../test_helpers.dart';
 
 class _FakeBookingRepository extends BookingRepository {
-  _FakeBookingRepository(this._result) : super(apiClient: ApiClient());
+  _FakeBookingRepository(this._result)
+      : super(
+          remoteDataSource: BookingRemoteDataSource(apiClient: ApiClient()),
+          localDataSource: MyBookingsLocalDataSource(),
+        );
 
   final Future<Booking> Function(int slotId, int userId) _result;
 
@@ -22,9 +29,14 @@ class _FakeBookingRepository extends BookingRepository {
 }
 
 void main() {
+  setUpAll(() async {
+    await initTestHive();
+  });
+
   group('BookingCubit', () {
     test('emits success when booking succeeds', () async {
-      final userSession = UserSession()..selectUser(const User(id: 1, name: 'Ashu'));
+      final userSession = UserSession()
+        ..selectUser(const User(id: 1, name: 'Ashu'));
       final cubit = BookingCubit(
         bookingRepository: _FakeBookingRepository(
           (slotId, userId) async => Booking(
@@ -54,7 +66,8 @@ void main() {
     });
 
     test('emits failure when repository throws', () async {
-      final userSession = UserSession()..selectUser(const User(id: 1, name: 'Ashu'));
+      final userSession = UserSession()
+        ..selectUser(const User(id: 1, name: 'Ashu'));
       final cubit = BookingCubit(
         bookingRepository: _FakeBookingRepository(
           (_, __) async => throw Exception('Slot already booked'),

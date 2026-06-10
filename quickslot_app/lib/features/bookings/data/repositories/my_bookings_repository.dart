@@ -1,56 +1,47 @@
-import 'package:dio/dio.dart';
-import 'package:quickslot_app/core/network/api_client.dart';
-import 'package:quickslot_app/features/bookings/data/models/user_booking_model.dart';
-import 'package:quickslot_app/features/bookings/domain/entities/user_booking.dart';
+import 'package:quickslot_app/features/bookings/data/local/my_bookings_local_data_source.dart';
+import 'package:quickslot_app/features/bookings/data/models/my_bookings_result.dart';
+import 'package:quickslot_app/features/bookings/data/remote/my_bookings_remote_data_source.dart';
 
 class MyBookingsRepository {
-  MyBookingsRepository({required ApiClient apiClient}) : _apiClient = apiClient;
+  MyBookingsRepository({
+    required MyBookingsRemoteDataSource remoteDataSource,
+    required MyBookingsLocalDataSource localDataSource,
+  })  : _remoteDataSource = remoteDataSource,
+        _localDataSource = localDataSource;
 
-  final ApiClient _apiClient;
+  final MyBookingsRemoteDataSource _remoteDataSource;
+  final MyBookingsLocalDataSource _localDataSource;
 
-  Future<List<UserBooking>> getUserBookings({required int userId}) async {
+  Future<MyBookingsResult> getUserBookings({required int userId}) async {
     try {
-      final response = await _apiClient.dio.get<Map<String, dynamic>>(
-        '/bookings/user/$userId',
+      final bookings = await _remoteDataSource.fetchBookings(userId: userId);
+      await _localDataSource.cacheBookings(
+        userId: userId,
+        bookings: bookings,
       );
-      final body = response.data;
 
-      if (body == null || body['success'] != true) {
-        throw Exception(
-          body?['message'] as String? ?? 'Failed to fetch bookings',
+      return MyBookingsResult(bookings: bookings);
+    } catch (error) {
+      final cached = await _localDataSource.getCachedBookings(userId: userId);
+
+      if (cached != null) {
+        return MyBookingsResult(
+          bookings: cached,
+          isFromCache: true,
         );
       }
 
-      final data = body['data'] as List<dynamic>? ?? [];
-
-      return data
-          .map(
-            (item) => UserBookingModel.fromJson(item as Map<String, dynamic>),
-          )
-          .toList();
-    } on DioException catch (error) {
-      throw Exception(_mapDioError(error));
+      rethrow;
     }
   }
 
-  String _mapDioError(DioException error) {
-    final responseData = error.response?.data;
-    if (responseData is Map<String, dynamic>) {
-      final message = responseData['message'];
-      if (message is String && message.isNotEmpty) {
-        return message;
-      }
-    }
-
-    switch (error.type) {
-      case DioExceptionType.connectionTimeout:
-      case DioExceptionType.receiveTimeout:
-      case DioExceptionType.sendTimeout:
-        return 'Connection timed out. Please try again.';
-      case DioExceptionType.connectionError:
-        return 'Unable to connect. Check your internet connection.';
-      default:
-        return 'Something went wrong. Please try again.';
-    }
+  Future<void> removeCachedBooking({
+    required int userId,
+    required int bookingId,
+  }) {
+    return _localDataSource.removeBooking(
+      userId: userId,
+      bookingId: bookingId,
+    );
   }
 }

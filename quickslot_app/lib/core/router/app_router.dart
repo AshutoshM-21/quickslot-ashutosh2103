@@ -65,6 +65,7 @@ class AppRouter {
               BlocProvider(
                 create: (_) => CancelBookingCubit(
                   bookingRepository: AppDependencies.bookingRepository,
+                  userSession: AppDependencies.userSession,
                 ),
               ),
             ],
@@ -85,6 +86,7 @@ class AppRouter {
               BlocProvider(
                 create: (_) => SlotsCubit(
                   slotRepository: AppDependencies.slotRepository,
+                  slotRealtimeService: AppDependencies.slotRealtimeService,
                   venueId: venueId,
                 )..loadSlots(),
               ),
