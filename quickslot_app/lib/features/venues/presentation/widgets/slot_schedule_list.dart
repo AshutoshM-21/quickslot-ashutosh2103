@@ -7,7 +7,6 @@ class SlotScheduleList extends StatelessWidget {
   const SlotScheduleList({
     super.key,
     required this.slots,
-    required this.sportLabel,
     required this.venueName,
     this.venueLocation,
     this.selectedSlotId,
@@ -15,7 +14,6 @@ class SlotScheduleList extends StatelessWidget {
   });
 
   final List<Slot> slots;
-  final String sportLabel;
   final String venueName;
   final String? venueLocation;
   final int? selectedSlotId;
@@ -44,7 +42,6 @@ class SlotScheduleList extends StatelessWidget {
           timeLabel: TimeFormatter.format(timeKey),
           venueName: venueName,
           venueLocation: venueLocation,
-          sportLabel: sportLabel,
           slots: timeSlots,
           selectedSlotId: selectedSlotId,
           onSlotTap: onSlotTap,
@@ -59,7 +56,6 @@ class _TimeGroup extends StatelessWidget {
     required this.timeLabel,
     required this.venueName,
     required this.venueLocation,
-    required this.sportLabel,
     required this.slots,
     required this.selectedSlotId,
     required this.onSlotTap,
@@ -68,7 +64,6 @@ class _TimeGroup extends StatelessWidget {
   final String timeLabel;
   final String venueName;
   final String? venueLocation;
-  final String sportLabel;
   final List<Slot> slots;
   final int? selectedSlotId;
   final ValueChanged<Slot> onSlotTap;
@@ -100,7 +95,6 @@ class _TimeGroup extends StatelessWidget {
                     slot: slots[i],
                     venueName: venueName,
                     venueLocation: venueLocation,
-                    sportLabel: sportLabel,
                     isSelected: selectedSlotId == slots[i].id,
                     onTap: slots[i].isAvailable
                         ? () => onSlotTap(slots[i])
@@ -121,7 +115,6 @@ class _SlotEntry extends StatelessWidget {
     required this.slot,
     required this.venueName,
     required this.venueLocation,
-    required this.sportLabel,
     required this.isSelected,
     this.onTap,
   });
@@ -129,7 +122,6 @@ class _SlotEntry extends StatelessWidget {
   final Slot slot;
   final String venueName;
   final String? venueLocation;
-  final String sportLabel;
   final bool isSelected;
   final VoidCallback? onTap;
 
@@ -176,7 +168,7 @@ class _SlotEntry extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         _SportButton(
-          label: sportLabel.toUpperCase(),
+          label: slot.sport.toUpperCase(),
           isSelected: isSelected,
           isEnabled: onTap != null,
           onTap: onTap,
@@ -223,9 +215,7 @@ class _SportButton extends StatelessWidget {
             fontSize: 13,
             fontWeight: FontWeight.w700,
             letterSpacing: 0.8,
-            color: isEnabled
-                ? AppColors.white
-                : AppColors.textTertiary,
+            color: isEnabled ? AppColors.white : AppColors.textTertiary,
           ),
         ),
       ),

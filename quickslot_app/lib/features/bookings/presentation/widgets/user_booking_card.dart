@@ -3,7 +3,6 @@ import 'package:quickslot_app/core/theme/app_colors.dart';
 import 'package:quickslot_app/core/theme/sport_visuals.dart';
 import 'package:quickslot_app/core/widgets/app_loading_indicator.dart';
 import 'package:quickslot_app/features/bookings/domain/entities/user_booking.dart';
-import 'package:quickslot_app/features/venues/domain/entities/venue.dart';
 
 class UserBookingCard extends StatelessWidget {
   const UserBookingCard({
@@ -19,9 +18,7 @@ class UserBookingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final style = SportVisuals.forVenue(
-      Venue(id: booking.id, name: booking.venueName),
-    );
+    final style = SportVisuals.forSport(booking.sport);
 
     return Container(
       decoration: BoxDecoration(
@@ -78,6 +75,12 @@ class UserBookingCard extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
             child: Column(
               children: [
+                _DetailTile(
+                  icon: Icons.sports_rounded,
+                  label: 'Sport',
+                  value: booking.sport,
+                ),
+                const SizedBox(height: 10),
                 _DetailTile(
                   icon: Icons.calendar_month_rounded,
                   label: 'Date',

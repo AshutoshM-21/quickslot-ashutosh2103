@@ -14,6 +14,7 @@ app.get("/", (req, res) => {
   res.json({
     success: true,
     message: "QuickSlot API Running",
+    realtime: req.app.locals.realtimeEnabled ?? false,
   });
 });
 app.use("/venues", venueRoutes);

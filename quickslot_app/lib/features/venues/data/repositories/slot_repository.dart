@@ -12,12 +12,14 @@ class SlotRepository {
   Future<List<Slot>> getSlots({
     required int venueId,
     required DateTime date,
+    String? sport,
   }) async {
     try {
       final response = await _apiClient.dio.get<Map<String, dynamic>>(
         '/venues/$venueId/slots',
         queryParameters: {
           'date': DateUtils.formatForApi(date),
+          if (sport != null && sport.isNotEmpty) 'sport': sport,
         },
       );
       final body = response.data;

@@ -88,6 +88,7 @@ class AppRouter {
                   slotRepository: AppDependencies.slotRepository,
                   slotRealtimeService: AppDependencies.slotRealtimeService,
                   venueId: venueId,
+                  venueSports: resolvedVenue.sports,
                 )..loadSlots(),
               ),
               BlocProvider(

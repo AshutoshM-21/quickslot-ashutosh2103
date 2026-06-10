@@ -16,6 +16,7 @@ import 'package:quickslot_app/features/venues/presentation/cubit/slots_cubit.dar
 import 'package:quickslot_app/features/venues/presentation/cubit/slots_state.dart';
 import 'package:quickslot_app/features/venues/presentation/widgets/slot_date_picker.dart';
 import 'package:quickslot_app/features/venues/presentation/widgets/slot_schedule_list.dart';
+import 'package:quickslot_app/features/venues/presentation/widgets/slot_sport_filter_bar.dart';
 import 'package:quickslot_app/features/venues/presentation/widgets/slot_time_filter_bar.dart';
 
 class VenueDetailPage extends StatelessWidget {
@@ -130,7 +131,18 @@ class _VenueDetailBodyState extends State<_VenueDetailBody> {
                                         .changeDate(date);
                                   },
                                 ),
-                                const SizedBox(height: 20),
+                                const SizedBox(height: 16),
+                                SlotSportFilterBar(
+                                  sports: state.availableSports,
+                                  selectedSport: state.selectedSport,
+                                  onSportSelected: (sport) {
+                                    setState(() => _selectedSlotId = null);
+                                    context
+                                        .read<SlotsCubit>()
+                                        .setSportFilter(sport);
+                                  },
+                                ),
+                                const SizedBox(height: 16),
                                 SlotTimeFilterBar(
                                   selectedFilter: state.timeFilter,
                                   onFilterSelected: (filter) {
@@ -178,7 +190,6 @@ class _VenueDetailBodyState extends State<_VenueDetailBody> {
                                       )
                                     : SlotScheduleList(
                                         slots: state.filteredSlots,
-                                        sportLabel: style.sport,
                                         venueName: venue.name,
                                         venueLocation: venue.location,
                                         selectedSlotId: _selectedSlotId,
@@ -260,7 +271,9 @@ class _VenueHeader extends StatelessWidget {
                 Icon(style.icon, size: 14, color: style.accent),
                 const SizedBox(width: 4),
                 Text(
-                  style.sport,
+                  venue.hasMultipleSports
+                      ? '${venue.sports.length} sports'
+                      : style.sport,
                   style: Theme.of(context).textTheme.labelMedium?.copyWith(
                         color: style.accent,
                         fontSize: 11,
@@ -334,7 +347,7 @@ class _RealtimeStatusBanner extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              'Live updates unavailable. Slots refresh after booking.',
+              'Live updates offline. Start the server locally or check your Railway deployment.',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: AppColors.error,
                   ),

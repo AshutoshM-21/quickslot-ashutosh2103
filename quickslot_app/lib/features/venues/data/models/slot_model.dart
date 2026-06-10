@@ -6,6 +6,7 @@ class SlotModel extends Slot {
     required super.startTime,
     required super.endTime,
     required super.status,
+    required super.sport,
   });
 
   factory SlotModel.fromJson(Map<String, dynamic> json) {
@@ -14,6 +15,9 @@ class SlotModel extends Slot {
       startTime: json['start_time'].toString(),
       endTime: json['end_time'].toString(),
       status: _parseStatus(json['status'] as String),
+      sport: (json['sport'] as String?)?.trim().isNotEmpty == true
+          ? json['sport'] as String
+          : 'Sports',
     );
   }
 

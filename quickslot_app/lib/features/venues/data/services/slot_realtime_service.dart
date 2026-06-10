@@ -7,7 +7,7 @@ enum RealtimeConnectionStatus { disconnected, connecting, connected, error }
 
 class SlotRealtimeService {
   SlotRealtimeService({String? serverUrl})
-      : _serverUrl = serverUrl ?? AppConstants.baseUrl;
+      : _serverUrl = serverUrl ?? AppConstants.socketUrl;
 
   final String _serverUrl;
   io.Socket? _socket;
@@ -30,11 +30,13 @@ class SlotRealtimeService {
     _socket = io.io(
       _serverUrl,
       io.OptionBuilder()
-          .setTransports(['websocket'])
+          .setTransports(['websocket', 'polling'])
           .disableAutoConnect()
           .enableReconnection()
-          .setReconnectionAttempts(5)
+          .setReconnectionAttempts(10)
           .setReconnectionDelay(2000)
+          .setReconnectionDelayMax(10000)
+          .setTimeout(20000)
           .build(),
     );
 

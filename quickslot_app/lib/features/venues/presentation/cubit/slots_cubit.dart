@@ -13,12 +13,15 @@ class SlotsCubit extends Cubit<SlotsState> {
     required int venueId,
     SlotRealtimeService? slotRealtimeService,
     DateTime? initialDate,
+    List<String> venueSports = const [],
   })  : _slotRepository = slotRepository,
         _slotRealtimeService = slotRealtimeService,
         super(
           SlotsState(
             venueId: venueId,
             selectedDate: DateUtils.dateOnly(initialDate ?? DateTime.now()),
+            venueSports: venueSports,
+            selectedSport: _initialSportFilter(venueSports),
           ),
         ) {
     _bindRealtimeService();
@@ -26,6 +29,13 @@ class SlotsCubit extends Cubit<SlotsState> {
 
   final SlotRepository _slotRepository;
   final SlotRealtimeService? _slotRealtimeService;
+
+  static String? _initialSportFilter(List<String> venueSports) {
+    if (venueSports.length == 1) {
+      return venueSports.first;
+    }
+    return null;
+  }
 
   void _bindRealtimeService() {
     final service = _slotRealtimeService;
@@ -56,6 +66,7 @@ class SlotsCubit extends Cubit<SlotsState> {
       final slots = await _slotRepository.getSlots(
         venueId: state.venueId,
         date: state.selectedDate,
+        sport: state.selectedSport,
       );
 
       if (slots.isEmpty) {
@@ -100,6 +111,17 @@ class SlotsCubit extends Cubit<SlotsState> {
     emit(state.copyWith(timeFilter: filter));
   }
 
+  Future<void> setSportFilter(String? sport) async {
+    emit(
+      state.copyWith(
+        selectedSport: sport,
+        clearSelectedSport: sport == null,
+        clearError: true,
+      ),
+    );
+    await loadSlots();
+  }
+
   void _handleSlotUpdate(SlotUpdateEvent event) {
     if (event.venueId != state.venueId) {
       return;
@@ -124,6 +146,7 @@ class SlotsCubit extends Cubit<SlotsState> {
         startTime: slot.startTime,
         endTime: slot.endTime,
         status: event.slotStatus,
+        sport: slot.sport,
       );
     }).toList();
 

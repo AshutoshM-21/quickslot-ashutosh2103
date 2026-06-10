@@ -21,7 +21,15 @@ npm install
 npm run dev
 ```
 
-API runs at **http://localhost:3000**. for now
+API + WebSocket server runs at **http://localhost:3000**.
+
+Run the sport migration once:
+
+```bash
+psql $DATABASE_URL -f server/db/migrations/001_add_sport_support.sql
+```
+
+For production with live updates, deploy `server/` to Railway (see [server/README.md](server/README.md)).
 
 ### 2. Frontend
 

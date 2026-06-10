@@ -6,7 +6,8 @@ Flutter mobile app for browsing sports venues, viewing available time slots, and
 
 - **User selection** — Pick a demo user (Ashu or Test User) to simulate multi-user booking
 - **Venue list** — Browse available sports venues
-- **Slot booking** — Select a date, view available slots, and book a time slot
+- **Slot booking** — Select a date, filter by sport and time of day, view available slots, and book
+- **Live slot updates** — WebSocket pushes availability changes when another user books
 - **My bookings** — View and cancel your bookings
 - **Responsive UI** — Works across phone and tablet screen sizes
 
@@ -33,15 +34,19 @@ cd quickslot_app
 flutter pub get
 ```
 
-2. Confirm the API base URL in `lib/core/constants/app_constants.dart`:
+2. Configure API and WebSocket URLs in `lib/core/constants/app_constants.dart`, or pass them at build time:
 
-```dart
-static const String baseUrl = 'http://localhost:3000';
+```bash
+flutter run \
+  --dart-define=API_BASE_URL=http://localhost:3000 \
+  --dart-define=SOCKET_URL=http://localhost:3000
 ```
 
-For Android emulator, use `http://10.0.2.2:3000` instead of `localhost`.
+For Android emulator, use `http://10.0.2.2:3000` for both values.
 
 For a physical device, use your machine's local IP (e.g. `http://192.168.1.x:3000`).
+
+**Important:** `SOCKET_URL` must point to a long-running Node server (`npm run dev` or your Railway URL).
 
 ## Run Locally
 

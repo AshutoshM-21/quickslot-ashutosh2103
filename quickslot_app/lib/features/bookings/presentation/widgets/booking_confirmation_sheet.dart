@@ -167,7 +167,7 @@ class _BookingSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final style = SportVisuals.forVenue(venue);
+    final style = SportVisuals.forSport(slot.sport);
 
     return Container(
       padding: const EdgeInsets.all(18),
@@ -230,7 +230,7 @@ class _BookingSummaryCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '${style.sport} slot · ${slot.displayTimeRange}',
+                      '${slot.sport} slot · ${slot.displayTimeRange}',
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                   ],

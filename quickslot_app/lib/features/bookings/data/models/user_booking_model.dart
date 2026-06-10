@@ -9,6 +9,7 @@ class UserBookingModel extends UserBooking {
     required super.startTime,
     required super.endTime,
     required super.createdAt,
+    super.sport,
   });
 
   factory UserBookingModel.fromJson(Map<String, dynamic> json) {
@@ -21,6 +22,9 @@ class UserBookingModel extends UserBooking {
       startTime: json['start_time'].toString(),
       endTime: json['end_time'].toString(),
       createdAt: DateTime.parse(json['created_at'].toString()),
+      sport: (json['sport'] as String?)?.trim().isNotEmpty == true
+          ? json['sport'] as String
+          : 'Sports',
     );
   }
 
@@ -32,6 +36,7 @@ class UserBookingModel extends UserBooking {
       'start_time': startTime,
       'end_time': endTime,
       'created_at': createdAt.toIso8601String(),
+      'sport': sport,
     };
   }
 }

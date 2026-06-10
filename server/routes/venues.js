@@ -1,8 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const pool = require("../db/pool");
+const { formatVenueRow } = require("../db/sport-utils");
 
-//Get all venues endpoint
+// Get all venues endpoint
 router.get("/", async (req, res) => {
   try {
     const result = await pool.query(`
@@ -13,7 +14,7 @@ router.get("/", async (req, res) => {
 
     res.status(200).json({
       success: true,
-      data: result.rows,
+      data: result.rows.map(formatVenueRow),
     });
   } catch (error) {
     console.error(error);
@@ -25,11 +26,12 @@ router.get("/", async (req, res) => {
   }
 });
 
-//Venue slots endpoint
+// Venue slots endpoint
 router.get("/:id/slots", async (req, res) => {
   try {
     const venueId = parseInt(req.params.id);
     const date = req.query.date;
+    const sport = req.query.sport;
 
     if (!date) {
       return res.status(400).json({
@@ -38,19 +40,30 @@ router.get("/:id/slots", async (req, res) => {
       });
     }
 
+    const params = [venueId, date];
+    let sportClause = "";
+
+    if (sport) {
+      params.push(sport);
+      sportClause = `AND COALESCE(s.sport, v.sport, 'Sports') = $${params.length}`;
+    }
+
     const result = await pool.query(
       `
       SELECT
-        id,
-        start_time,
-        end_time,
-        status
-      FROM slots
-      WHERE venue_id = $1
-      AND slot_date = $2
-      ORDER BY start_time
+        s.id,
+        s.start_time,
+        s.end_time,
+        s.status,
+        COALESCE(s.sport, v.sport, 'Sports') AS sport
+      FROM slots s
+      JOIN venues v ON v.id = s.venue_id
+      WHERE s.venue_id = $1
+      AND s.slot_date = $2
+      ${sportClause}
+      ORDER BY s.start_time, sport
       `,
-      [venueId, date]
+      params
     );
 
     res.json({
@@ -66,4 +79,5 @@ router.get("/:id/slots", async (req, res) => {
     });
   }
 });
+
 module.exports = router;

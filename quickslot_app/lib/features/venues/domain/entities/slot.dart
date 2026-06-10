@@ -9,12 +9,14 @@ class Slot extends Equatable {
     required this.startTime,
     required this.endTime,
     required this.status,
+    required this.sport,
   });
 
   final int id;
   final String startTime;
   final String endTime;
   final SlotStatus status;
+  final String sport;
 
   bool get isAvailable => status == SlotStatus.available;
 
@@ -26,5 +28,5 @@ class Slot extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, startTime, endTime, status];
+  List<Object?> get props => [id, startTime, endTime, status, sport];
 }

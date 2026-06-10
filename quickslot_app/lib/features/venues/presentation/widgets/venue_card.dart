@@ -46,7 +46,9 @@ class VenueCard extends StatelessWidget {
                     left: 12,
                     child: _SportBadge(
                       icon: style.icon,
-                      label: style.sport,
+                      label: venue.hasMultipleSports
+                          ? '${venue.sports.length} sports'
+                          : style.sport,
                     ),
                   ),
                   Positioned(

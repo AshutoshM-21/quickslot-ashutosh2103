@@ -6,6 +6,7 @@ class VenueModel extends Venue {
     required super.name,
     super.description,
     super.location,
+    super.sports,
   });
 
   factory VenueModel.fromJson(Map<String, dynamic> json) {
@@ -14,6 +15,25 @@ class VenueModel extends Venue {
       name: json['name'] as String,
       description: json['description'] as String?,
       location: json['location'] as String?,
+      sports: _parseSports(json),
     );
+  }
+
+  static List<String> _parseSports(Map<String, dynamic> json) {
+    final sportsValue = json['sports'];
+    if (sportsValue is List) {
+      return sportsValue.map((sport) => sport.toString()).toList();
+    }
+
+    final legacySport = json['sport'];
+    if (legacySport is String && legacySport.isNotEmpty) {
+      return legacySport
+          .split(',')
+          .map((sport) => sport.trim())
+          .where((sport) => sport.isNotEmpty)
+          .toList();
+    }
+
+    return const [];
   }
 }

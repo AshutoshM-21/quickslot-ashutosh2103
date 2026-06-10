@@ -10,6 +10,7 @@ class UserBooking extends Equatable {
     required this.startTime,
     required this.endTime,
     required this.createdAt,
+    this.sport = 'Sports',
   });
 
   final int id;
@@ -18,6 +19,7 @@ class UserBooking extends Equatable {
   final String startTime;
   final String endTime;
   final DateTime createdAt;
+  final String sport;
 
   String get displayDate => DateUtils.formatForDisplay(slotDate);
 
@@ -34,5 +36,6 @@ class UserBooking extends Equatable {
         startTime,
         endTime,
         createdAt,
+        sport,
       ];
 }

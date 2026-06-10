@@ -107,7 +107,8 @@ router.get("/user/:userId", async (req, res) => {
         v.name as venue_name,
         s.slot_date,
         s.start_time,
-        s.end_time
+        s.end_time,
+        COALESCE(s.sport, v.sport, 'Sports') AS sport
       FROM bookings b
       JOIN slots s ON b.slot_id = s.id
       JOIN venues v ON s.venue_id = v.id

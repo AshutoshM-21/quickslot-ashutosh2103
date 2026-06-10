@@ -16,6 +16,7 @@ class _FakeSlotRepository extends SlotRepository {
   Future<List<Slot>> getSlots({
     required int venueId,
     required DateTime date,
+    String? sport,
   }) {
     return _result(venueId, date);
   }
@@ -34,6 +35,7 @@ void main() {
               startTime: '10:00:00',
               endTime: '11:00:00',
               status: SlotStatus.available,
+              sport: 'Badminton',
             ),
           ],
         ),
@@ -110,6 +112,33 @@ void main() {
       await cubit.close();
     });
 
+    test('updates selected sport and reloads slots', () async {
+      var callCount = 0;
+      final cubit = SlotsCubit(
+        slotRepository: _FakeSlotRepository((_, __) async {
+          callCount++;
+          return const [
+            Slot(
+              id: 1,
+              startTime: '10:00:00',
+              endTime: '11:00:00',
+              status: SlotStatus.available,
+              sport: 'Swimming',
+            ),
+          ];
+        }),
+        venueId: 1,
+        initialDate: testDate,
+        venueSports: const ['Badminton', 'Swimming'],
+      );
+
+      await cubit.setSportFilter('Swimming');
+
+      expect(cubit.state.selectedSport, 'Swimming');
+      expect(callCount, 1);
+      await cubit.close();
+    });
+
     test('preserves time filter after reload', () async {
       final cubit = SlotsCubit(
         slotRepository: _FakeSlotRepository(
@@ -119,6 +148,7 @@ void main() {
               startTime: '10:00:00',
               endTime: '11:00:00',
               status: SlotStatus.available,
+              sport: 'Badminton',
             ),
           ],
         ),
