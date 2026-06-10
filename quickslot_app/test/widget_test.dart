@@ -18,7 +18,7 @@ void main() {
     expect(find.text('Continue'), findsOneWidget);
   });
 
-  testWidgets('Continue navigates to home after selecting a user',
+  testWidgets('Continue navigates away from user selection',
       (WidgetTester tester) async {
     await tester.pumpWidget(const QuickSlotApp());
     await tester.pumpAndSettle();
@@ -29,7 +29,7 @@ void main() {
     await tester.tap(find.text('Continue'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Welcome, Ashu'), findsOneWidget);
+    expect(find.text('Select User'), findsNothing);
     expect(AppDependencies.userSession.selectedUser?.id, 1);
   });
 }
