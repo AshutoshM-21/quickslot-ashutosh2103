@@ -3,6 +3,7 @@ const cors = require("cors");
 
 const app = express();
 const venueRoutes = require("./routes/venues");
+const bookingRoutes = require("./routes/bookings");
 
 app.use(cors());
 app.use(express.json());
@@ -14,4 +15,5 @@ app.get("/", (req, res) => {
   });
 });
 app.use("/venues", venueRoutes);
+app.use("/bookings", bookingRoutes);
 module.exports = app;
