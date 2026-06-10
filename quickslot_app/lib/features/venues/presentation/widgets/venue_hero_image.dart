@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:quickslot_app/core/constants/venue_images.dart';
 import 'package:quickslot_app/core/theme/sport_visuals.dart';
@@ -30,12 +29,20 @@ class VenueHeroImage extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            CachedNetworkImage(
-              imageUrl: imageUrl,
+            Image.network(
+              imageUrl,
               fit: BoxFit.cover,
-              fadeInDuration: const Duration(milliseconds: 300),
-              placeholder: (_, __) => _GradientBackdrop(style: style),
-              errorWidget: (_, __, ___) => _GradientBackdrop(style: style),
+              gaplessPlayback: true,
+              filterQuality: FilterQuality.medium,
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) {
+                  return child;
+                }
+                return _GradientBackdrop(style: style);
+              },
+              errorBuilder: (context, error, stackTrace) {
+                return _GradientBackdrop(style: style);
+              },
             ),
             Positioned(
               right: -24,
@@ -52,10 +59,10 @@ class VenueHeroImage extends StatelessWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Colors.black.withValues(alpha: 0.1),
-                    Colors.black.withValues(alpha: 0.55),
+                    Colors.black.withValues(alpha: 0.05),
+                    Colors.black.withValues(alpha: 0.5),
                   ],
-                  stops: const [0.4, 1.0],
+                  stops: const [0.45, 1.0],
                 ),
               ),
             ),

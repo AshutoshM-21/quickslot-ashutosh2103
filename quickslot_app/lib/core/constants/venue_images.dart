@@ -26,6 +26,17 @@ class VenueImages {
       return venue.imageUrl!;
     }
 
+    final name = venue.name.toLowerCase();
+    if (name.contains('badminton')) {
+      return badminton;
+    }
+    if (name.contains('turf') || name.contains('football')) {
+      return football;
+    }
+    if (name.contains('cricket') || name.contains('sports hub')) {
+      return cricket;
+    }
+
     return forSport(venue.primarySport);
   }
 
