@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:quickslot_app/core/di/app_dependencies.dart';
 import 'package:quickslot_app/core/widgets/app_scaffold.dart';
 import 'package:quickslot_app/features/bookings/presentation/cubit/booking_cubit.dart';
 import 'package:quickslot_app/features/bookings/presentation/cubit/booking_state.dart';
@@ -21,7 +22,8 @@ class VenueDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<BookingCubit, BookingState>(
+    return _SlotsRefreshListener(
+      child: BlocListener<BookingCubit, BookingState>(
       listenWhen: (previous, current) => previous.status != current.status,
       listener: (context, state) {
         switch (state.status) {
@@ -97,8 +99,42 @@ class VenueDetailPage extends StatelessWidget {
           },
         ),
       ),
+      ),
     );
   }
+}
+
+class _SlotsRefreshListener extends StatefulWidget {
+  const _SlotsRefreshListener({required this.child});
+
+  final Widget child;
+
+  @override
+  State<_SlotsRefreshListener> createState() => _SlotsRefreshListenerState();
+}
+
+class _SlotsRefreshListenerState extends State<_SlotsRefreshListener> {
+  @override
+  void initState() {
+    super.initState();
+    AppDependencies.slotsRefreshSignal.addListener(_refreshSlots);
+  }
+
+  @override
+  void dispose() {
+    AppDependencies.slotsRefreshSignal.removeListener(_refreshSlots);
+    super.dispose();
+  }
+
+  void _refreshSlots() {
+    if (!mounted) {
+      return;
+    }
+    context.read<SlotsCubit>().loadSlots();
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
 }
 
 class _SlotLegend extends StatelessWidget {

@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:quickslot_app/core/di/app_dependencies.dart';
 import 'package:quickslot_app/core/widgets/app_scaffold.dart';
 import 'package:quickslot_app/features/bookings/domain/entities/user_booking.dart';
+import 'package:quickslot_app/features/bookings/presentation/cubit/cancel_booking_cubit.dart';
+import 'package:quickslot_app/features/bookings/presentation/cubit/cancel_booking_state.dart';
 import 'package:quickslot_app/features/bookings/presentation/cubit/my_bookings_cubit.dart';
 import 'package:quickslot_app/features/bookings/presentation/cubit/my_bookings_state.dart';
+import 'package:quickslot_app/features/bookings/presentation/widgets/cancel_booking_dialog.dart';
 import 'package:quickslot_app/features/bookings/presentation/widgets/user_booking_card.dart';
 
 class MyBookingsPage extends StatelessWidget {
@@ -11,26 +15,55 @@ class MyBookingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppScaffold(
-      title: 'My Bookings',
-      showBackButton: true,
-      body: BlocBuilder<MyBookingsCubit, MyBookingsState>(
-        builder: (context, state) {
-          return switch (state.status) {
-            MyBookingsStatus.initial || MyBookingsStatus.loading =>
-              const Center(
-                child: CircularProgressIndicator(),
+    return BlocListener<CancelBookingCubit, CancelBookingState>(
+      listenWhen: (previous, current) => previous.status != current.status,
+      listener: (context, state) {
+        switch (state.status) {
+          case CancelBookingStatus.idle:
+          case CancelBookingStatus.cancelling:
+            break;
+          case CancelBookingStatus.success:
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Booking cancelled'),
               ),
-            MyBookingsStatus.error => _MyBookingsErrorView(
-                message: state.errorMessage ?? 'Failed to load bookings',
-                onRetry: () => context.read<MyBookingsCubit>().loadBookings(),
+            );
+            context.read<MyBookingsCubit>().loadBookings();
+            AppDependencies.requestSlotsRefresh();
+            context.read<CancelBookingCubit>().reset();
+          case CancelBookingStatus.failure:
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  state.errorMessage ?? 'Cancellation failed',
+                ),
               ),
-            MyBookingsStatus.empty => const _MyBookingsEmptyView(),
-            MyBookingsStatus.loaded => _MyBookingsListView(
-                bookings: state.bookings,
-              ),
-          };
-        },
+            );
+            context.read<CancelBookingCubit>().reset();
+        }
+      },
+      child: AppScaffold(
+        title: 'My Bookings',
+        showBackButton: true,
+        body: BlocBuilder<MyBookingsCubit, MyBookingsState>(
+          builder: (context, state) {
+            return switch (state.status) {
+              MyBookingsStatus.initial || MyBookingsStatus.loading =>
+                const Center(
+                  child: CircularProgressIndicator(),
+                ),
+              MyBookingsStatus.error => _MyBookingsErrorView(
+                  message: state.errorMessage ?? 'Failed to load bookings',
+                  onRetry: () =>
+                      context.read<MyBookingsCubit>().loadBookings(),
+                ),
+              MyBookingsStatus.empty => const _MyBookingsEmptyView(),
+              MyBookingsStatus.loaded => _MyBookingsListView(
+                  bookings: state.bookings,
+                ),
+            };
+          },
+        ),
       ),
     );
   }
@@ -41,19 +74,47 @@ class _MyBookingsListView extends StatelessWidget {
 
   final List<UserBooking> bookings;
 
+  Future<void> _handleCancel(
+    BuildContext context,
+    UserBooking booking,
+  ) async {
+    final confirmed = await showCancelBookingDialog(
+      context: context,
+      booking: booking,
+    );
+
+    if (!context.mounted || !confirmed) {
+      return;
+    }
+
+    context.read<CancelBookingCubit>().cancelBooking(booking.id);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return RefreshIndicator(
-      onRefresh: () => context.read<MyBookingsCubit>().loadBookings(),
-      child: ListView.separated(
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(16),
-        itemCount: bookings.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 12),
-        itemBuilder: (context, index) {
-          return UserBookingCard(booking: bookings[index]);
-        },
-      ),
+    return BlocBuilder<CancelBookingCubit, CancelBookingState>(
+      builder: (context, cancelState) {
+        return RefreshIndicator(
+          onRefresh: () => context.read<MyBookingsCubit>().loadBookings(),
+          child: ListView.separated(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.all(16),
+            itemCount: bookings.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 12),
+            itemBuilder: (context, index) {
+              final booking = bookings[index];
+              final isCancelling = cancelState.isCancelling &&
+                  cancelState.bookingId == booking.id;
+
+              return UserBookingCard(
+                booking: booking,
+                isCancelling: isCancelling,
+                onCancel: () => _handleCancel(context, booking),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 }

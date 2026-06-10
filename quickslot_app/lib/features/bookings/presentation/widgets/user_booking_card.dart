@@ -5,9 +5,13 @@ class UserBookingCard extends StatelessWidget {
   const UserBookingCard({
     super.key,
     required this.booking,
+    this.onCancel,
+    this.isCancelling = false,
   });
 
   final UserBooking booking;
+  final VoidCallback? onCancel;
+  final bool isCancelling;
 
   @override
   Widget build(BuildContext context) {
@@ -78,6 +82,33 @@ class UserBookingCard extends StatelessWidget {
                       ),
                     ],
                   ),
+                  if (onCancel != null) ...[
+                    const SizedBox(height: 12),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton.icon(
+                        onPressed: isCancelling ? null : onCancel,
+                        icon: isCancelling
+                            ? SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: theme.colorScheme.error,
+                                ),
+                              )
+                            : Icon(
+                                Icons.cancel_outlined,
+                                size: 18,
+                                color: theme.colorScheme.error,
+                              ),
+                        label: Text(
+                          isCancelling ? 'Cancelling...' : 'Cancel booking',
+                          style: TextStyle(color: theme.colorScheme.error),
+                        ),
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),

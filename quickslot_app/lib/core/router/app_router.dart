@@ -6,6 +6,7 @@ import 'package:quickslot_app/core/router/app_routes.dart';
 import 'package:quickslot_app/features/auth/presentation/cubit/user_selection_cubit.dart';
 import 'package:quickslot_app/features/auth/presentation/pages/user_selection_page.dart';
 import 'package:quickslot_app/features/bookings/presentation/cubit/booking_cubit.dart';
+import 'package:quickslot_app/features/bookings/presentation/cubit/cancel_booking_cubit.dart';
 import 'package:quickslot_app/features/bookings/presentation/cubit/my_bookings_cubit.dart';
 import 'package:quickslot_app/features/bookings/presentation/pages/my_bookings_page.dart';
 import 'package:quickslot_app/features/venues/domain/entities/venue.dart';
@@ -53,11 +54,20 @@ class AppRouter {
         path: AppRoutes.myBookings,
         name: AppRoutes.myBookings,
         builder: (context, state) {
-          return BlocProvider(
-            create: (_) => MyBookingsCubit(
-              myBookingsRepository: AppDependencies.myBookingsRepository,
-              userSession: AppDependencies.userSession,
-            )..loadBookings(),
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (_) => MyBookingsCubit(
+                  myBookingsRepository: AppDependencies.myBookingsRepository,
+                  userSession: AppDependencies.userSession,
+                )..loadBookings(),
+              ),
+              BlocProvider(
+                create: (_) => CancelBookingCubit(
+                  bookingRepository: AppDependencies.bookingRepository,
+                ),
+              ),
+            ],
             child: const MyBookingsPage(),
           );
         },

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:quickslot_app/core/network/api_client.dart';
 import 'package:quickslot_app/features/auth/data/repositories/user_repository.dart';
 import 'package:quickslot_app/features/auth/data/repositories/user_session.dart';
@@ -20,4 +21,10 @@ class AppDependencies {
       BookingRepository(apiClient: apiClient);
   static final MyBookingsRepository myBookingsRepository =
       MyBookingsRepository(apiClient: apiClient);
+
+  static final ValueNotifier<int> slotsRefreshSignal = ValueNotifier(0);
+
+  static void requestSlotsRefresh() {
+    slotsRefreshSignal.value++;
+  }
 }

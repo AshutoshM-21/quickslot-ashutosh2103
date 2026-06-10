@@ -39,6 +39,23 @@ class BookingRepository {
     }
   }
 
+  Future<void> cancelBooking({required int bookingId}) async {
+    try {
+      final response = await _apiClient.dio.delete<Map<String, dynamic>>(
+        '/bookings/$bookingId',
+      );
+      final body = response.data;
+
+      if (body == null || body['success'] != true) {
+        throw Exception(
+          body?['message'] as String? ?? 'Cancellation failed',
+        );
+      }
+    } on DioException catch (error) {
+      throw Exception(_mapDioError(error));
+    }
+  }
+
   String _mapDioError(DioException error) {
     final responseData = error.response?.data;
     if (responseData is Map<String, dynamic>) {
