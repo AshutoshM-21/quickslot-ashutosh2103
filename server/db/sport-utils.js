@@ -22,6 +22,7 @@ function formatVenueRow(row) {
     description: row.description ?? null,
     location: row.location ?? null,
     sports,
+    imageUrl: row.image_url ?? null,
   };
 }
 

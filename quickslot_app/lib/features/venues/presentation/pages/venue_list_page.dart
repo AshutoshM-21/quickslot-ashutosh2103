@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:quickslot_app/core/constants/app_constants.dart';
 import 'package:quickslot_app/core/di/app_dependencies.dart';
 import 'package:quickslot_app/core/router/app_routes.dart';
-import 'package:quickslot_app/core/theme/app_colors.dart';
 import 'package:quickslot_app/core/utils/responsive_utils.dart';
 import 'package:quickslot_app/core/widgets/app_empty_view.dart';
 import 'package:quickslot_app/core/widgets/app_error_view.dart';
@@ -13,6 +12,7 @@ import 'package:quickslot_app/core/widgets/app_scaffold.dart';
 import 'package:quickslot_app/features/venues/domain/entities/venue.dart';
 import 'package:quickslot_app/features/venues/presentation/cubit/venues_cubit.dart';
 import 'package:quickslot_app/features/venues/presentation/cubit/venues_state.dart';
+import 'package:quickslot_app/features/venues/presentation/widgets/home_header.dart';
 import 'package:quickslot_app/features/venues/presentation/widgets/venue_card.dart';
 
 class VenueListPage extends StatelessWidget {
@@ -25,29 +25,30 @@ class VenueListPage extends StatelessWidget {
     return AppScaffold(
       title: AppConstants.appName,
       actions: [
-        Padding(
-          padding: const EdgeInsets.only(right: 8),
-          child: FilledButton.tonalIcon(
-            onPressed: () => context.push(AppRoutes.myBookings),
-            icon: const Icon(Icons.event_note_rounded, size: 18),
-            label: const Text('Bookings'),
-          ),
+        IconButton(
+          tooltip: 'My Bookings',
+          onPressed: () => context.push(AppRoutes.myBookings),
+          icon: const Icon(Icons.event_note_rounded),
         ),
       ],
       body: BlocBuilder<VenuesCubit, VenuesState>(
         builder: (context, state) {
           return switch (state.status) {
             VenuesStatus.initial || VenuesStatus.loading =>
-              const AppLoadingView(),
-            VenuesStatus.error => AppErrorView(
-                title: 'Could not load venues',
-                message: state.errorMessage ?? 'Failed to load venues',
-                onRetry: () => context.read<VenuesCubit>().loadVenues(),
+              const SizedBox.expand(child: AppLoadingView()),
+            VenuesStatus.error => SizedBox.expand(
+                child: AppErrorView(
+                  title: 'Could not load venues',
+                  message: state.errorMessage ?? 'Failed to load venues',
+                  onRetry: () => context.read<VenuesCubit>().loadVenues(),
+                ),
               ),
-            VenuesStatus.empty => const AppEmptyView(
-                icon: Icons.location_off_outlined,
-                title: 'No venues available',
-                subtitle: 'Check back later for new venues.',
+            VenuesStatus.empty => const SizedBox.expand(
+                child: AppEmptyView(
+                  icon: Icons.location_off_outlined,
+                  title: 'No venues available',
+                  subtitle: 'Check back later for new venues.',
+                ),
               ),
             VenuesStatus.loaded => _VenueListView(
                 venues: state.venues,
@@ -85,25 +86,13 @@ class _VenueListView extends StatelessWidget {
           if (index == 0) {
             return const SizedBox(height: 20);
           }
-          return const SizedBox(height: 16);
+          return const SizedBox(height: 18);
         },
         itemBuilder: (context, index) {
           if (index == 0) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  greeting != null ? 'Hi, $greeting' : 'Find your court',
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  'Book premium sports venues near you.',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
-                ),
-              ],
+            return HomeHeader(
+              greeting: greeting,
+              venueCount: venues.length,
             );
           }
 

@@ -1,15 +1,10 @@
--- Example seed data for multi-sport venues.
--- Adjust IDs/dates to match your database before running.
+-- Example seed data for multi-sport venues with cover images.
+-- Run migration 002_add_venue_images.sql first.
 
--- Example venue with multiple sports
--- INSERT INTO venues (name, location, sport, sports, description)
--- VALUES (
---   'Fitso Thubarahalli MKR Sports Arena',
---   'Thubarahalli, Bengaluru',
---   'Badminton',
---   'Badminton,Swimming,Table Tennis',
---   'Multi-sport arena with badminton courts, swimming pool, and table tennis.'
--- );
+-- UPDATE venues SET
+--   sports = 'Badminton,Swimming,Table Tennis',
+--   image_url = 'https://images.unsplash.com/photo-1626224583764-f87db27ef38c?w=900&q=80'
+-- WHERE id = 1;
 
 -- Example slots for venue_id = 1 on 2026-06-10
 -- INSERT INTO slots (venue_id, slot_date, start_time, end_time, status, sport) VALUES

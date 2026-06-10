@@ -7,6 +7,7 @@ class VenueModel extends Venue {
     super.description,
     super.location,
     super.sports,
+    super.imageUrl,
   });
 
   factory VenueModel.fromJson(Map<String, dynamic> json) {
@@ -16,7 +17,16 @@ class VenueModel extends Venue {
       description: json['description'] as String?,
       location: json['location'] as String?,
       sports: _parseSports(json),
+      imageUrl: _parseImageUrl(json),
     );
+  }
+
+  static String? _parseImageUrl(Map<String, dynamic> json) {
+    final value = json['imageUrl'] ?? json['image_url'];
+    if (value is String && value.trim().isNotEmpty) {
+      return value.trim();
+    }
+    return null;
   }
 
   static List<String> _parseSports(Map<String, dynamic> json) {

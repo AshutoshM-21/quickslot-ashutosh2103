@@ -164,7 +164,7 @@ server/
 
 ## Database Schema
 
-- **venues** — `id`, `name`, `location`, `description`, `sport` (legacy), `sports` (comma-separated)
+- **venues** — `id`, `name`, `location`, `description`, `sport` (legacy), `sports` (comma-separated), `image_url` (cover photo URL)
 - **slots** — `id`, `venue_id`, `slot_date`, `start_time`, `end_time`, `status`, `sport`
 - **bookings** — `id`, `user_id`, `slot_id`, `created_at`
 
