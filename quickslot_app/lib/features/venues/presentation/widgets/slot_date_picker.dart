@@ -1,87 +1,136 @@
 import 'package:flutter/material.dart' hide DateUtils;
 import 'package:quickslot_app/core/theme/app_colors.dart';
 import 'package:quickslot_app/core/utils/date_utils.dart';
-import 'package:quickslot_app/core/widgets/app_card.dart';
 
 class SlotDatePicker extends StatelessWidget {
   const SlotDatePicker({
     super.key,
     required this.selectedDate,
     required this.onDateSelected,
+    this.daysToShow = 14,
   });
 
   final DateTime selectedDate;
   final ValueChanged<DateTime> onDateSelected;
+  final int daysToShow;
 
-  Future<void> _pickDate(BuildContext context) async {
-    final now = DateUtils.dateOnly(DateTime.now());
-    final pickedDate = await showDatePicker(
-      context: context,
-      initialDate: selectedDate.isBefore(now) ? now : selectedDate,
-      firstDate: now,
-      lastDate: now.add(const Duration(days: 30)),
-    );
-
-    if (pickedDate != null) {
-      onDateSelected(pickedDate);
-    }
-  }
+  static const _weekdays = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
 
   @override
   Widget build(BuildContext context) {
-    return AppCard(
-      onTap: () => _pickDate(context),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      child: Row(
+    final today = DateUtils.dateOnly(DateTime.now());
+    final dates = List.generate(
+      daysToShow,
+      (index) => today.add(Duration(days: index)),
+    );
+
+    return SizedBox(
+      height: 72,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: dates.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        itemBuilder: (context, index) {
+          final date = dates[index];
+          final isSelected = DateUtils.dateOnly(date) ==
+              DateUtils.dateOnly(selectedDate);
+
+          return _DateChip(
+            day: date.day,
+            weekday: _weekdays[date.weekday - 1],
+            isSelected: isSelected,
+            onTap: () => onDateSelected(date),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _DateChip extends StatelessWidget {
+  const _DateChip({
+    required this.day,
+    required this.weekday,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final int day;
+  final String weekday;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            width: 44,
-            height: 44,
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            width: 52,
+            height: 52,
             decoration: BoxDecoration(
-              color: AppColors.primaryLight,
-              borderRadius: BorderRadius.circular(12),
+              color: isSelected ? AppColors.dateSelected : Colors.transparent,
+              borderRadius: BorderRadius.circular(10),
             ),
-            child: const Icon(
-              Icons.calendar_month_rounded,
-              color: AppColors.primary,
-              size: 22,
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'Selected date',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.textTertiary,
-                        fontWeight: FontWeight.w500,
-                      ),
+                  '$day',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: isSelected
+                        ? AppColors.white
+                        : AppColors.textSecondary,
+                  ),
                 ),
-                const SizedBox(height: 2),
                 Text(
-                  DateUtils.formatForDisplay(selectedDate),
-                  style: Theme.of(context).textTheme.titleMedium,
+                  weekday,
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.5,
+                    color: isSelected
+                        ? AppColors.white.withValues(alpha: 0.85)
+                        : AppColors.textTertiary,
+                  ),
                 ),
               ],
             ),
           ),
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: AppColors.borderLight,
-              borderRadius: BorderRadius.circular(10),
+          if (isSelected) ...[
+            const SizedBox(height: 4),
+            CustomPaint(
+              size: const Size(12, 6),
+              painter: _TrianglePainter(color: AppColors.dateSelected),
             ),
-            child: const Icon(
-              Icons.keyboard_arrow_down_rounded,
-              color: AppColors.textSecondary,
-              size: 20,
-            ),
-          ),
+          ],
         ],
       ),
     );
   }
+}
+
+class _TrianglePainter extends CustomPainter {
+  const _TrianglePainter({required this.color});
+
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final path = Path()
+      ..moveTo(0, 0)
+      ..lineTo(size.width / 2, size.height)
+      ..lineTo(size.width, 0)
+      ..close();
+    canvas.drawPath(path, Paint()..color = color);
+  }
+
+  @override
+  bool shouldRepaint(covariant _TrianglePainter oldDelegate) =>
+      oldDelegate.color != color;
 }

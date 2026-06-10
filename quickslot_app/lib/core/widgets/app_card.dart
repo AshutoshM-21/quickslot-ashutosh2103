@@ -20,7 +20,7 @@ class AppCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final decoration = BoxDecoration(
-      color: AppColors.white,
+      color: AppColors.surface,
       borderRadius: BorderRadius.circular(16),
       border: Border.all(
         color: isSelected ? AppColors.primary : AppColors.border,
@@ -42,7 +42,7 @@ class AppCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         child: Ink(
           decoration: decoration.copyWith(
-            color: isSelected ? AppColors.primaryLight : AppColors.white,
+            color: isSelected ? AppColors.primaryLight : AppColors.surface,
           ),
           child: content,
         ),

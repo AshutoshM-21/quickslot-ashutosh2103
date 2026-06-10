@@ -5,18 +5,18 @@ import 'package:quickslot_app/core/theme/app_colors.dart';
 class AppTheme {
   AppTheme._();
 
-  static ThemeData get light {
+  static ThemeData get dark {
     const colorScheme = ColorScheme(
-      brightness: Brightness.light,
+      brightness: Brightness.dark,
       primary: AppColors.primary,
       onPrimary: AppColors.white,
       primaryContainer: AppColors.primaryLight,
-      onPrimaryContainer: AppColors.primaryDark,
+      onPrimaryContainer: AppColors.white,
       secondary: AppColors.primary,
       onSecondary: AppColors.white,
       error: AppColors.error,
       onError: AppColors.white,
-      surface: AppColors.white,
+      surface: AppColors.surface,
       onSurface: AppColors.textPrimary,
       onSurfaceVariant: AppColors.textSecondary,
       outline: AppColors.border,
@@ -66,6 +66,11 @@ class AppTheme {
         fontWeight: FontWeight.w600,
         color: AppColors.textPrimary,
       ),
+      labelMedium: const TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.w600,
+        color: AppColors.textPrimary,
+      ),
     );
 
     return ThemeData(
@@ -77,10 +82,10 @@ class AppTheme {
         centerTitle: true,
         elevation: 0,
         scrolledUnderElevation: 0,
-        backgroundColor: AppColors.white,
+        backgroundColor: AppColors.background,
         foregroundColor: AppColors.textPrimary,
         surfaceTintColor: Colors.transparent,
-        systemOverlayStyle: SystemUiOverlayStyle.dark,
+        systemOverlayStyle: SystemUiOverlayStyle.light,
         titleTextStyle: TextStyle(
           fontSize: 17,
           fontWeight: FontWeight.w600,
@@ -90,7 +95,7 @@ class AppTheme {
       ),
       cardTheme: CardThemeData(
         elevation: 0,
-        color: AppColors.white,
+        color: AppColors.surface,
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
@@ -101,7 +106,7 @@ class AppTheme {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           elevation: 0,
-          backgroundColor: AppColors.primary,
+          backgroundColor: AppColors.primaryDark,
           foregroundColor: AppColors.white,
           disabledBackgroundColor: AppColors.borderLight,
           disabledForegroundColor: AppColors.textTertiary,
@@ -120,7 +125,7 @@ class AppTheme {
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           elevation: 0,
-          backgroundColor: AppColors.primary,
+          backgroundColor: AppColors.primaryDark,
           foregroundColor: AppColors.white,
           minimumSize: const Size.fromHeight(48),
           shape: RoundedRectangleBorder(
@@ -170,9 +175,9 @@ class AppTheme {
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
-        backgroundColor: AppColors.textPrimary,
+        backgroundColor: AppColors.surfaceElevated,
         contentTextStyle: const TextStyle(
-          color: AppColors.white,
+          color: AppColors.textPrimary,
           fontSize: 14,
           fontWeight: FontWeight.w500,
         ),
@@ -182,7 +187,7 @@ class AppTheme {
         elevation: 4,
       ),
       dialogTheme: DialogThemeData(
-        backgroundColor: AppColors.white,
+        backgroundColor: AppColors.surface,
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
@@ -193,7 +198,7 @@ class AppTheme {
         ),
       ),
       bottomSheetTheme: const BottomSheetThemeData(
-        backgroundColor: AppColors.white,
+        backgroundColor: AppColors.surface,
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -212,8 +217,27 @@ class AppTheme {
           return AppColors.border;
         }),
       ),
-      splashColor: AppColors.primary.withValues(alpha: 0.08),
-      highlightColor: AppColors.primary.withValues(alpha: 0.04),
+      segmentedButtonTheme: SegmentedButtonThemeData(
+        style: ButtonStyle(
+          backgroundColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return AppColors.chipSelected;
+            }
+            return Colors.transparent;
+          }),
+          foregroundColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return AppColors.chipSelectedText;
+            }
+            return AppColors.textPrimary;
+          }),
+          side: WidgetStateProperty.all(
+            const BorderSide(color: AppColors.border),
+          ),
+        ),
+      ),
+      splashColor: AppColors.primary.withValues(alpha: 0.12),
+      highlightColor: AppColors.primary.withValues(alpha: 0.06),
     );
   }
 }

@@ -28,7 +28,7 @@ class UserOptionTile extends StatelessWidget {
             backgroundColor:
                 isSelected ? AppColors.primary : AppColors.primaryLight,
             foregroundColor:
-                isSelected ? AppColors.white : AppColors.primaryDark,
+                isSelected ? AppColors.white : AppColors.primary,
             child: Text(
               user.name.isNotEmpty ? user.name[0].toUpperCase() : '?',
               style: const TextStyle(

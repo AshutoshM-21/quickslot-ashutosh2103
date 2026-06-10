@@ -5,6 +5,7 @@ import 'package:quickslot_app/core/utils/responsive_utils.dart';
 import 'package:quickslot_app/core/widgets/app_empty_view.dart';
 import 'package:quickslot_app/core/widgets/app_error_view.dart';
 import 'package:quickslot_app/core/widgets/app_loading_view.dart';
+import 'package:quickslot_app/core/theme/app_colors.dart';
 import 'package:quickslot_app/core/widgets/app_scaffold.dart';
 import 'package:quickslot_app/features/bookings/domain/entities/user_booking.dart';
 import 'package:quickslot_app/features/bookings/presentation/cubit/cancel_booking_cubit.dart';
@@ -116,14 +117,34 @@ class _MyBookingsListView extends StatelessWidget {
           child: ListView.separated(
             physics: const AlwaysScrollableScrollPhysics(),
             padding: EdgeInsets.all(padding),
-            itemCount: bookings.length + (showCachedBanner ? 1 : 0),
-            separatorBuilder: (_, __) => const SizedBox(height: 12),
+            itemCount: bookings.length + (showCachedBanner ? 2 : 1),
+            separatorBuilder: (_, __) => const SizedBox(height: 16),
             itemBuilder: (context, index) {
-              if (showCachedBanner && index == 0) {
+              if (index == 0) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Your reservations',
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Manage upcoming and confirmed bookings.',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                    ),
+                  ],
+                );
+              }
+
+              if (showCachedBanner && index == 1) {
                 return const CachedDataBanner();
               }
 
-              final bookingIndex = showCachedBanner ? index - 1 : index;
+              final headerOffset = showCachedBanner ? 2 : 1;
+              final bookingIndex = index - headerOffset;
               final booking = bookings[bookingIndex];
               final isCancelling = cancelState.isCancelling &&
                   cancelState.bookingId == booking.id;

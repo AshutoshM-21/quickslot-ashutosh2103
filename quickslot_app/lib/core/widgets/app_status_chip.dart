@@ -18,7 +18,7 @@ class AppStatusChip extends StatelessWidget {
     final (background, foreground) = switch (variant) {
       AppStatusChipVariant.available => (
           AppColors.primaryLight,
-          AppColors.primaryDark,
+          AppColors.primary,
         ),
       AppStatusChipVariant.booked => (
           AppColors.bookedLight,

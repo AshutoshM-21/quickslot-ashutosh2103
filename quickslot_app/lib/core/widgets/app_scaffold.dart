@@ -25,7 +25,7 @@ class AppScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.backgroundDeep,
       appBar: title == null
           ? null
           : AppBar(
@@ -38,8 +38,13 @@ class AppScaffold extends StatelessWidget {
                 child: Divider(height: 1, thickness: 1),
               ),
             ),
-      body: SafeArea(
-        child: ResponsiveContent(child: body),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: AppColors.backgroundGradient,
+        ),
+        child: SafeArea(
+          child: ResponsiveContent(child: body),
+        ),
       ),
       floatingActionButton: floatingActionButton,
       bottomNavigationBar: bottomNavigationBar,
