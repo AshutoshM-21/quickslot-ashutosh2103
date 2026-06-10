@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart' hide DateUtils;
+import 'package:quickslot_app/core/theme/app_colors.dart';
 import 'package:quickslot_app/core/utils/date_utils.dart';
+import 'package:quickslot_app/core/widgets/app_card.dart';
 
 class SlotDatePicker extends StatelessWidget {
   const SlotDatePicker({
@@ -27,48 +29,58 @@ class SlotDatePicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Card(
-      child: InkWell(
-        onTap: () => _pickDate(context),
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          child: Row(
-            children: [
-              Icon(
-                Icons.calendar_today_outlined,
-                color: theme.colorScheme.primary,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Selected date',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      DateUtils.formatForDisplay(selectedDate),
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Icon(
-                Icons.chevron_right,
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ],
+    return AppCard(
+      onTap: () => _pickDate(context),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: AppColors.primaryLight,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(
+              Icons.calendar_month_rounded,
+              color: AppColors.primary,
+              size: 22,
+            ),
           ),
-        ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Selected date',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppColors.textTertiary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  DateUtils.formatForDisplay(selectedDate),
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ],
+            ),
+          ),
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: AppColors.borderLight,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Icon(
+              Icons.keyboard_arrow_down_rounded,
+              color: AppColors.textSecondary,
+              size: 20,
+            ),
+          ),
+        ],
       ),
     );
   }

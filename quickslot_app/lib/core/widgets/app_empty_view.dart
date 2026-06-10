@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quickslot_app/core/theme/app_colors.dart';
 
 class AppEmptyView extends StatelessWidget {
   const AppEmptyView({
@@ -14,33 +15,38 @@ class AppEmptyView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              icon,
-              size: 64,
-              color: theme.colorScheme.onSurfaceVariant,
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: AppColors.borderLight,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                size: 36,
+                color: AppColors.textTertiary,
+              ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             Text(
               title,
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+              style: Theme.of(context).textTheme.titleLarge,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             Text(
               subtitle,
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppColors.textSecondary,
+                    height: 1.5,
+                  ),
               textAlign: TextAlign.center,
             ),
           ],

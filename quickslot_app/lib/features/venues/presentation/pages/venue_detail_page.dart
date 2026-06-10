@@ -15,6 +15,7 @@ import 'package:quickslot_app/features/venues/domain/entities/venue.dart';
 import 'package:quickslot_app/features/venues/presentation/cubit/slots_cubit.dart';
 import 'package:quickslot_app/features/venues/presentation/cubit/slots_state.dart';
 import 'package:quickslot_app/features/venues/presentation/widgets/slot_date_picker.dart';
+import 'package:quickslot_app/core/widgets/app_status_chip.dart';
 import 'package:quickslot_app/features/venues/presentation/widgets/slot_grid_tile.dart';
 
 class VenueDetailPage extends StatelessWidget {
@@ -149,45 +150,24 @@ class _SlotLegend extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Row(
-      children: [
-        _LegendItem(
-          color: SlotGridTile.availableColor,
-          label: 'Available',
-        ),
-        SizedBox(width: 16),
-        _LegendItem(
-          color: SlotGridTile.bookedColor,
-          label: 'Booked',
-        ),
-      ],
-    );
-  }
-}
-
-class _LegendItem extends StatelessWidget {
-  const _LegendItem({
-    required this.color,
-    required this.label,
-  });
-
-  final Color color;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
     return Row(
       children: [
-        Container(
-          width: 12,
-          height: 12,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-          ),
+        Text(
+          'Legend',
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
         ),
-        const SizedBox(width: 6),
-        Text(label),
+        const SizedBox(width: 12),
+        const AppStatusChip(
+          label: 'Available',
+          variant: AppStatusChipVariant.available,
+        ),
+        const SizedBox(width: 8),
+        const AppStatusChip(
+          label: 'Booked',
+          variant: AppStatusChipVariant.booked,
+        ),
       ],
     );
   }
@@ -215,7 +195,7 @@ class _SlotsGridView extends StatelessWidget {
             crossAxisCount: crossAxisCount,
             mainAxisSpacing: 12,
             crossAxisSpacing: 12,
-            childAspectRatio: 1.5,
+            childAspectRatio: 1.35,
           ),
           itemCount: slots.length,
           itemBuilder: (context, index) {

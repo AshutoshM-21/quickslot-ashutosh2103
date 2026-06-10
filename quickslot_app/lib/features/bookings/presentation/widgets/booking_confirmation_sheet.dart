@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:quickslot_app/core/theme/app_colors.dart';
 import 'package:quickslot_app/core/widgets/app_loading_indicator.dart';
 import 'package:quickslot_app/features/bookings/presentation/cubit/booking_cubit.dart';
 import 'package:quickslot_app/features/bookings/presentation/cubit/booking_state.dart';
@@ -12,6 +13,7 @@ Future<void> showBookingConfirmationSheet({
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
+    backgroundColor: AppColors.white,
     builder: (sheetContext) {
       return BlocProvider.value(
         value: context.read<BookingCubit>(),
@@ -31,11 +33,9 @@ class BookingConfirmationSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+        padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -45,41 +45,48 @@ class BookingConfirmationSheet extends StatelessWidget {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.onSurfaceVariant.withValues(
-                    alpha: 0.4,
-                  ),
+                  color: AppColors.border,
                   borderRadius: BorderRadius.circular(999),
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
             Text(
               'Confirm booking',
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+              style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 8),
             Text(
-              'Book this slot?',
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
+              'You are about to reserve this time slot.',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(12),
+                color: AppColors.primaryLight,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppColors.primaryMuted),
               ),
-              child: Text(
-                slot.displayTimeRange,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-                textAlign: TextAlign.center,
+              child: Column(
+                children: [
+                  const Icon(
+                    Icons.schedule_rounded,
+                    color: AppColors.primary,
+                    size: 28,
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    slot.displayTimeRange,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: AppColors.primaryDark,
+                        ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 24),
@@ -94,7 +101,7 @@ class BookingConfirmationSheet extends StatelessWidget {
                         onPressed: isBooking
                             ? null
                             : () => Navigator.of(context).pop(),
-                        child: const Text('Cancel'),
+                        child: const Text('Not now'),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -106,7 +113,9 @@ class BookingConfirmationSheet extends StatelessWidget {
                                 context.read<BookingCubit>().bookSlot(slot.id);
                               },
                         child: isBooking
-                            ? const AppLoadingIndicator()
+                            ? const AppLoadingIndicator(
+                                color: AppColors.white,
+                              )
                             : const Text('Confirm'),
                       ),
                     ),

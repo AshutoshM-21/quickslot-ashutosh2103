@@ -8,7 +8,9 @@ import 'package:quickslot_app/core/utils/responsive_utils.dart';
 import 'package:quickslot_app/core/widgets/app_empty_view.dart';
 import 'package:quickslot_app/core/widgets/app_error_view.dart';
 import 'package:quickslot_app/core/widgets/app_loading_view.dart';
+import 'package:quickslot_app/core/theme/app_colors.dart';
 import 'package:quickslot_app/core/widgets/app_scaffold.dart';
+import 'package:quickslot_app/core/widgets/app_section_header.dart';
 import 'package:quickslot_app/features/venues/domain/entities/venue.dart';
 import 'package:quickslot_app/features/venues/presentation/cubit/venues_cubit.dart';
 import 'package:quickslot_app/features/venues/presentation/cubit/venues_state.dart';
@@ -24,10 +26,16 @@ class VenueListPage extends StatelessWidget {
     return AppScaffold(
       title: AppConstants.appName,
       actions: [
-        IconButton(
-          onPressed: () => context.push(AppRoutes.myBookings),
-          icon: const Icon(Icons.event_note_outlined),
-          tooltip: 'My bookings',
+        Padding(
+          padding: const EdgeInsets.only(right: 4),
+          child: IconButton(
+            onPressed: () => context.push(AppRoutes.myBookings),
+            style: IconButton.styleFrom(
+              backgroundColor: AppColors.borderLight,
+            ),
+            icon: const Icon(Icons.event_note_rounded, size: 22),
+            tooltip: 'My bookings',
+          ),
         ),
       ],
       body: BlocBuilder<VenuesCubit, VenuesState>(
@@ -67,7 +75,6 @@ class _VenueListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final padding = ResponsiveUtils.horizontalPadding(
       MediaQuery.sizeOf(context).width,
     );
@@ -76,33 +83,19 @@ class _VenueListView extends StatelessWidget {
       onRefresh: () => context.read<VenuesCubit>().loadVenues(),
       child: ListView.separated(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: EdgeInsets.all(padding),
+        padding: EdgeInsets.fromLTRB(padding, padding, padding, padding + 8),
         itemCount: venues.length + 1,
         separatorBuilder: (_, index) {
           if (index == 0) {
-            return const SizedBox(height: 16);
+            return const SizedBox(height: 20);
           }
           return const SizedBox(height: 12);
         },
         itemBuilder: (context, index) {
           if (index == 0) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  greeting != null ? 'Hi, $greeting' : 'Browse venues',
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Pick a venue to view available slots.',
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
+            return AppSectionHeader(
+              title: greeting != null ? 'Hi, $greeting' : 'Browse venues',
+              subtitle: 'Pick a venue to view and book available slots.',
             );
           }
 

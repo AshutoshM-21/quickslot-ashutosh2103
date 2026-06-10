@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quickslot_app/core/theme/app_colors.dart';
 import 'package:quickslot_app/core/widgets/responsive_content.dart';
 
 class AppScaffold extends StatelessWidget {
@@ -24,6 +25,7 @@ class AppScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: title == null
           ? null
           : AppBar(
@@ -31,6 +33,10 @@ class AppScaffold extends StatelessWidget {
               centerTitle: centerTitle,
               automaticallyImplyLeading: showBackButton,
               actions: actions,
+              bottom: const PreferredSize(
+                preferredSize: Size.fromHeight(1),
+                child: Divider(height: 1, thickness: 1),
+              ),
             ),
       body: SafeArea(
         child: ResponsiveContent(child: body),

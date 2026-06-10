@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:quickslot_app/core/theme/app_colors.dart';
+import 'package:quickslot_app/core/widgets/app_card.dart';
 import 'package:quickslot_app/core/widgets/app_loading_indicator.dart';
+import 'package:quickslot_app/core/widgets/app_status_chip.dart';
 import 'package:quickslot_app/features/bookings/domain/entities/user_booking.dart';
 
 class UserBookingCard extends StatelessWidget {
@@ -16,102 +19,109 @@ class UserBookingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: 56,
-              height: 56,
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(12),
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryLight,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: const Icon(
+                  Icons.event_available_rounded,
+                  color: AppColors.primary,
+                  size: 24,
+                ),
               ),
-              child: Icon(
-                Icons.event_available_outlined,
-                color: theme.colorScheme.onPrimaryContainer,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    booking.venueName,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      booking.venueName,
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.calendar_today_outlined,
-                        size: 16,
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        booking.displayDate,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.schedule_outlined,
-                        size: 16,
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                      const SizedBox(width: 4),
-                      Expanded(
-                        child: Text(
-                          booking.displayTimeRange,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  if (onCancel != null) ...[
-                    const SizedBox(height: 12),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton.icon(
-                        onPressed: isCancelling ? null : onCancel,
-                        icon: isCancelling
-                            ? AppLoadingIndicator(
-                                size: 16,
-                                color: theme.colorScheme.error,
-                              )
-                            : Icon(
-                                Icons.cancel_outlined,
-                                size: 18,
-                                color: theme.colorScheme.error,
-                              ),
-                        label: Text(
-                          isCancelling ? 'Cancelling...' : 'Cancel booking',
-                          style: TextStyle(color: theme.colorScheme.error),
-                        ),
-                      ),
+                    const SizedBox(height: 8),
+                    const AppStatusChip(
+                      label: 'Confirmed',
+                      variant: AppStatusChipVariant.available,
                     ),
                   ],
-                ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          const Divider(),
+          const SizedBox(height: 12),
+          _InfoRow(
+            icon: Icons.calendar_today_outlined,
+            label: booking.displayDate,
+          ),
+          const SizedBox(height: 8),
+          _InfoRow(
+            icon: Icons.schedule_rounded,
+            label: booking.displayTimeRange,
+          ),
+          if (onCancel != null) ...[
+            const SizedBox(height: 14),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: isCancelling ? null : onCancel,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.error,
+                  side: const BorderSide(color: AppColors.border),
+                ),
+                icon: isCancelling
+                    ? const AppLoadingIndicator(
+                        size: 16,
+                        color: AppColors.error,
+                      )
+                    : const Icon(Icons.close_rounded, size: 18),
+                label: Text(
+                  isCancelling ? 'Cancelling...' : 'Cancel booking',
+                ),
               ),
             ),
           ],
-        ),
+        ],
       ),
+    );
+  }
+}
+
+class _InfoRow extends StatelessWidget {
+  const _InfoRow({
+    required this.icon,
+    required this.label,
+  });
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, size: 16, color: AppColors.textTertiary),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            label,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+          ),
+        ),
+      ],
     );
   }
 }

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:quickslot_app/core/theme/app_colors.dart';
+import 'package:quickslot_app/core/widgets/app_card.dart';
+import 'package:quickslot_app/core/widgets/app_status_chip.dart';
 import 'package:quickslot_app/features/venues/domain/entities/slot.dart';
 
 class SlotGridTile extends StatelessWidget {
@@ -11,53 +14,37 @@ class SlotGridTile extends StatelessWidget {
   final Slot slot;
   final VoidCallback? onTap;
 
-  static const Color availableColor = Color(0xFF2E7D32);
-  static const Color bookedColor = Color(0xFFC62828);
+  static const Color availableColor = AppColors.available;
+  static const Color bookedColor = AppColors.booked;
 
   @override
   Widget build(BuildContext context) {
-    final backgroundColor = slot.isAvailable ? availableColor : bookedColor;
-    final statusLabel = slot.isAvailable ? 'Available' : 'Booked';
+    final isAvailable = slot.isAvailable;
 
-    return Material(
-      color: backgroundColor,
-      borderRadius: BorderRadius.circular(12),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                slot.displayTimeRange,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 13,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                child: Text(
-                  statusLabel,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
+    return AppCard(
+      onTap: onTap,
+      showShadow: isAvailable,
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          AppStatusChip(
+            label: isAvailable ? 'Available' : 'Booked',
+            variant: isAvailable
+                ? AppStatusChipVariant.available
+                : AppStatusChipVariant.booked,
           ),
-        ),
+          Text(
+            slot.displayTimeRange,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: isAvailable
+                      ? AppColors.textPrimary
+                      : AppColors.textTertiary,
+                  fontSize: 14,
+                ),
+          ),
+        ],
       ),
     );
   }

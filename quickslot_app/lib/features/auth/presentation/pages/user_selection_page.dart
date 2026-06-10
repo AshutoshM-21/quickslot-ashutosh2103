@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:quickslot_app/core/constants/app_constants.dart';
 import 'package:quickslot_app/core/router/app_routes.dart';
+import 'package:quickslot_app/core/theme/app_colors.dart';
 import 'package:quickslot_app/core/widgets/app_scaffold.dart';
+import 'package:quickslot_app/core/widgets/app_section_header.dart';
 import 'package:quickslot_app/core/widgets/responsive_padding.dart';
 import 'package:quickslot_app/features/auth/presentation/cubit/user_selection_cubit.dart';
 import 'package:quickslot_app/features/auth/presentation/cubit/user_selection_state.dart';
@@ -20,27 +23,41 @@ class UserSelectionPage extends StatelessWidget {
         context.go(AppRoutes.home);
       },
       child: AppScaffold(
-        title: 'Select User',
         body: BlocBuilder<UserSelectionCubit, UserSelectionState>(
           builder: (context, state) {
             return ResponsivePadding(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(
-                    'Who is using QuickSlot?',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Choose a profile to continue.',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                  ),
                   const SizedBox(height: 24),
+                  Center(
+                    child: Container(
+                      width: 72,
+                      height: 72,
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryLight,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: AppColors.cardShadow,
+                      ),
+                      child: const Icon(
+                        Icons.event_available_rounded,
+                        size: 36,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    AppConstants.appName,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                  const SizedBox(height: 32),
+                  const AppSectionHeader(
+                    title: 'Who is using QuickSlot?',
+                    subtitle: 'Choose a profile to continue booking.',
+                  ),
+                  const SizedBox(height: 20),
                   Expanded(
                     child: ListView.separated(
                       itemCount: state.users.length,
@@ -70,6 +87,7 @@ class UserSelectionPage extends StatelessWidget {
                         : null,
                     child: const Text('Continue'),
                   ),
+                  const SizedBox(height: 8),
                 ],
               ),
             );

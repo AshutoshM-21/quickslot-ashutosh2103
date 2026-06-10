@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quickslot_app/app.dart';
+import 'package:quickslot_app/core/constants/app_constants.dart';
 import 'package:quickslot_app/core/di/app_dependencies.dart';
 
 void main() {
@@ -12,7 +13,8 @@ void main() {
     await tester.pumpWidget(const QuickSlotApp());
     await tester.pumpAndSettle();
 
-    expect(find.text('Select User'), findsOneWidget);
+    expect(find.text(AppConstants.appName), findsOneWidget);
+    expect(find.text('Who is using QuickSlot?'), findsOneWidget);
     expect(find.text('Ashu'), findsOneWidget);
     expect(find.text('Test User'), findsOneWidget);
     expect(find.text('Continue'), findsOneWidget);
@@ -29,7 +31,7 @@ void main() {
     await tester.tap(find.text('Continue'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Select User'), findsNothing);
+    expect(find.text('Who is using QuickSlot?'), findsNothing);
     expect(AppDependencies.userSession.selectedUser?.id, 1);
   });
 }
