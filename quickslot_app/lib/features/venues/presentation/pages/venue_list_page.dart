@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:quickslot_app/core/constants/app_constants.dart';
+import 'package:quickslot_app/core/router/app_routes.dart';
 import 'package:quickslot_app/core/di/app_dependencies.dart';
 import 'package:quickslot_app/core/widgets/app_scaffold.dart';
 import 'package:quickslot_app/features/venues/domain/entities/venue.dart';
@@ -87,7 +89,15 @@ class _VenueListView extends StatelessWidget {
           }
 
           final venue = venues[index - 1];
-          return VenueCard(venue: venue);
+          return VenueCard(
+            venue: venue,
+            onTap: () {
+              context.push(
+                AppRoutes.venueDetailPath(venue.id),
+                extra: venue,
+              );
+            },
+          );
         },
       ),
     );

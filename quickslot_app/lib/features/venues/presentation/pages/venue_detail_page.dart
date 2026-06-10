@@ -1,0 +1,266 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:quickslot_app/core/widgets/app_scaffold.dart';
+import 'package:quickslot_app/features/bookings/presentation/cubit/booking_cubit.dart';
+import 'package:quickslot_app/features/bookings/presentation/cubit/booking_state.dart';
+import 'package:quickslot_app/features/bookings/presentation/widgets/booking_confirmation_sheet.dart';
+import 'package:quickslot_app/features/venues/domain/entities/slot.dart';
+import 'package:quickslot_app/features/venues/domain/entities/venue.dart';
+import 'package:quickslot_app/features/venues/presentation/cubit/slots_cubit.dart';
+import 'package:quickslot_app/features/venues/presentation/cubit/slots_state.dart';
+import 'package:quickslot_app/features/venues/presentation/widgets/slot_date_picker.dart';
+import 'package:quickslot_app/features/venues/presentation/widgets/slot_grid_tile.dart';
+
+class VenueDetailPage extends StatelessWidget {
+  const VenueDetailPage({
+    super.key,
+    required this.venue,
+  });
+
+  final Venue venue;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocListener<BookingCubit, BookingState>(
+      listenWhen: (previous, current) => previous.status != current.status,
+      listener: (context, state) {
+        switch (state.status) {
+          case BookingStatus.idle:
+          case BookingStatus.booking:
+            break;
+          case BookingStatus.success:
+            Navigator.of(context).pop();
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Slot booked successfully'),
+              ),
+            );
+            context.read<SlotsCubit>().loadSlots();
+            context.read<BookingCubit>().reset();
+          case BookingStatus.failure:
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  state.errorMessage ?? 'Booking failed',
+                ),
+              ),
+            );
+            context.read<BookingCubit>().reset();
+        }
+      },
+      child: AppScaffold(
+        title: venue.name,
+        showBackButton: true,
+        body: BlocBuilder<SlotsCubit, SlotsState>(
+          builder: (context, state) {
+            return Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SlotDatePicker(
+                    selectedDate: state.selectedDate,
+                    onDateSelected: (date) {
+                      context.read<SlotsCubit>().changeDate(date);
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  _SlotLegend(),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: switch (state.status) {
+                      SlotsStatus.initial || SlotsStatus.loading =>
+                        const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      SlotsStatus.error => _SlotsErrorView(
+                          message:
+                              state.errorMessage ?? 'Failed to load slots',
+                          onRetry: () =>
+                              context.read<SlotsCubit>().loadSlots(),
+                        ),
+                      SlotsStatus.empty => const _SlotsEmptyView(),
+                      SlotsStatus.loaded => _SlotsGridView(
+                          slots: state.slots,
+                          onSlotTap: (slot) {
+                            showBookingConfirmationSheet(
+                              context: context,
+                              slot: slot,
+                            );
+                          },
+                        ),
+                    },
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _SlotLegend extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        _LegendItem(
+          color: SlotGridTile.availableColor,
+          label: 'Available',
+        ),
+        const SizedBox(width: 16),
+        _LegendItem(
+          color: SlotGridTile.bookedColor,
+          label: 'Booked',
+        ),
+      ],
+    );
+  }
+}
+
+class _LegendItem extends StatelessWidget {
+  const _LegendItem({
+    required this.color,
+    required this.label,
+  });
+
+  final Color color;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 12,
+          height: 12,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+          ),
+        ),
+        const SizedBox(width: 6),
+        Text(label),
+      ],
+    );
+  }
+}
+
+class _SlotsGridView extends StatelessWidget {
+  const _SlotsGridView({
+    required this.slots,
+    required this.onSlotTap,
+  });
+
+  final List<Slot> slots;
+  final ValueChanged<Slot> onSlotTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 12,
+        crossAxisSpacing: 12,
+        childAspectRatio: 1.5,
+      ),
+      itemCount: slots.length,
+      itemBuilder: (context, index) {
+        final slot = slots[index];
+        return SlotGridTile(
+          slot: slot,
+          onTap: slot.isAvailable ? () => onSlotTap(slot) : null,
+        );
+      },
+    );
+  }
+}
+
+class _SlotsEmptyView extends StatelessWidget {
+  const _SlotsEmptyView();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.event_busy_outlined,
+            size: 64,
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'No slots for this date',
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Try selecting a different date.',
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SlotsErrorView extends StatelessWidget {
+  const _SlotsErrorView({
+    required this.message,
+    required this.onRetry,
+  });
+
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.error_outline,
+            size: 64,
+            color: theme.colorScheme.error,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Could not load slots',
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            message,
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton(
+            onPressed: onRetry,
+            child: const Text('Retry'),
+          ),
+        ],
+      ),
+    );
+  }
+}
